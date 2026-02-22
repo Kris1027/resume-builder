@@ -85,7 +85,7 @@ export const PreviewPage = () => {
     }, []);
 
     const handleDownloadPDF = async () => {
-        const element = document.getElementById('cv-content');
+        const element = document.getElementById('resume-content');
         if (!element || !resumeData) return;
 
         setIsExporting(true);
@@ -350,7 +350,7 @@ export const PreviewPage = () => {
                             className='mx-auto max-w-[210mm]'
                         >
                             <motion.div
-                                id='cv-content'
+                                id='resume-content'
                                 className='overflow-hidden bg-white text-gray-900 shadow-xl'
                                 {...fadeInScale(0.1, shouldReduceMotion)}
                             >
@@ -413,7 +413,7 @@ export const PreviewPage = () => {
           }
 
           /* Clean CV content for print */
-          #cv-content {
+          #resume-content {
             margin: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;

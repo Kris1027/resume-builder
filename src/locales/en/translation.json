@@ -219,8 +219,8 @@
         },
         "gdprConsent": {
             "title": "GDPR Consent Clause",
-            "description": "Add a GDPR data processing consent clause to the bottom of your CV",
-            "enable": "Include GDPR consent clause in CV",
+            "description": "Add a GDPR data processing consent clause to the bottom of your resume",
+            "enable": "Include GDPR consent clause in resume",
             "companyName": "Company name",
             "companyNamePlaceholder": "Enter company name",
             "companyNameHint": "Leave empty for a generic clause without a company name"
@@ -236,8 +236,8 @@
     },
     "dialogs": {
         "reset": {
-            "title": "Reset CV Data",
-            "description": "Are you sure you want to reset all your CV data? Your last manual save will be kept as a backup.",
+            "title": "Reset Resume Data",
+            "description": "Are you sure you want to reset all your resume data? Your last manual save will be kept as a backup.",
             "cancel": "Cancel",
             "confirm": "Reset All Data"
         },
@@ -249,22 +249,22 @@
         }
     },
     "preview": {
-        "title": "Your CV Preview",
-        "noData": "No CV data found",
-        "noDataHint": "Please fill out the form first to preview your CV.",
-        "startBuilding": "Start Building Your CV",
+        "title": "Your Resume Preview",
+        "noData": "No resume data found",
+        "noDataHint": "Please fill out the form first to preview your resume.",
+        "startBuilding": "Start Building Your Resume",
         "multiPage": "Multi",
         "singlePage": "Single",
         "downloadPdf": "Download PDF",
         "exporting": "Exporting...",
-        "editCv": "Edit CV",
+        "editCv": "Edit Resume",
         "success": {
-            "title": "Congratulations! Your CV is ready.",
+            "title": "Congratulations! Your resume is ready.",
             "subtitle": "You can now download as PDF or continue editing."
         },
         "contentWarning": {
             "title": "Content is very long",
-            "subtitle": "Your CV has been scaled to the minimum (50%). Consider reducing content for better readability."
+            "subtitle": "Your resume has been scaled to the minimum (50%). Consider reducing content for better readability."
         },
         "exportError": "Failed to export PDF. Please try again.",
         "exportErrorTitle": "Export Failed"
@@ -344,7 +344,7 @@
     },
     "privacy": {
         "notice": "Your data stays private",
-        "details": "All your CV data is stored locally in your browser. Nothing is sent to any server.",
+        "details": "All your resume data is stored locally in your browser. Nothing is sent to any server.",
         "accept": "Got it"
     },
     "pwa": {
