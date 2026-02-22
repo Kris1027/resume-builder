@@ -49,8 +49,8 @@ export interface GdprConsentProps {
     companyName: string;
 }
 
-// CVData used by sample data and templates (gdprConsent is optional)
-export type CVData = {
+// ResumeData used by sample data and templates (gdprConsent is optional)
+export type ResumeData = {
     personalInfo: PersonalInfoProps;
     experiences: ExperienceProps[];
     education: EducationProps[];
@@ -61,4 +61,4 @@ export type CVData = {
 };
 
 // Form values inferred from Zod schema — single source of truth
-export type { CVFormValues } from '@/schemas/cv-schema';
+export type { ResumeFormValues } from '@/schemas/resume-schema';

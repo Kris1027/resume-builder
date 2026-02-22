@@ -73,8 +73,8 @@ export const TemplatesPage = () => {
     const bgShapes = useParallax({ yRange: 40 });
 
     useEffect(() => {
-        const savedData = safeStorage.getItem('cvData');
-        const savedTime = safeStorage.getItem('cvData_lastSaved');
+        const savedData = safeStorage.getItem('resumeData');
+        const savedTime = safeStorage.getItem('resumeData_lastSaved');
 
         if (savedData) {
             setHasSavedData(true);
@@ -85,9 +85,9 @@ export const TemplatesPage = () => {
     }, []);
 
     const handleReset = () => {
-        safeStorage.removeItem('cvData');
-        safeStorage.removeItem('cvData_backup');
-        safeStorage.removeItem('cvData_lastSaved');
+        safeStorage.removeItem('resumeData');
+        safeStorage.removeItem('resumeData_backup');
+        safeStorage.removeItem('resumeData_lastSaved');
         setHasSavedData(false);
         setLastSaved(null);
     };

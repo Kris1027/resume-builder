@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { cvFormSchema } from './cv-schema';
+import { resumeFormSchema } from './resume-schema';
 
 const validForm = {
     templateId: 'developer',
@@ -42,9 +42,9 @@ const validForm = {
     gdprConsent: { enabled: true, companyName: 'ACME Corp' },
 };
 
-describe('cvFormSchema', () => {
+describe('resumeFormSchema', () => {
     it('accepts a fully valid form', () => {
-        const result = cvFormSchema.safeParse(validForm);
+        const result = resumeFormSchema.safeParse(validForm);
         expect(result.success).toBe(true);
     });
 
@@ -54,7 +54,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, firstName: '' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
             if (!result.success) {
                 const messages = result.error.issues.map((i) => i.message);
@@ -67,7 +67,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, lastName: '' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
             if (!result.success) {
                 const messages = result.error.issues.map((i) => i.message);
@@ -80,7 +80,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, email: '' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
             if (!result.success) {
                 const messages = result.error.issues.map((i) => i.message);
@@ -95,7 +95,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, email: 'not-an-email' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
             if (!result.success) {
                 const messages = result.error.issues.map((i) => i.message);
@@ -108,7 +108,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, email: 'test@domain.com' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(true);
         });
     });
@@ -127,7 +127,7 @@ describe('cvFormSchema', () => {
                     github: '',
                 },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(true);
         });
     });
@@ -140,7 +140,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 languages: [{ language: 'Test', proficiency: level }],
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(true);
         });
 
@@ -149,7 +149,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 languages: [{ language: 'Test', proficiency: 'X9' }],
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
     });
@@ -160,7 +160,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 gdprConsent: { enabled: false, companyName: '' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(true);
         });
 
@@ -169,7 +169,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 gdprConsent: { enabled: 'yes', companyName: '' },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
     });
@@ -180,7 +180,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, firstName: 'a'.repeat(101) },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
             if (!result.success) {
                 const messages = result.error.issues.map((i) => i.message);
@@ -193,7 +193,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, lastName: 'a'.repeat(101) },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -205,7 +205,7 @@ describe('cvFormSchema', () => {
                     email: 'a'.repeat(243) + '@example.com',
                 },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -214,7 +214,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, phone: '1'.repeat(31) },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -223,7 +223,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 personalInfo: { ...validForm.personalInfo, website: 'a'.repeat(201) },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -232,7 +232,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 experiences: [{ ...validForm.experiences[0], description: 'a'.repeat(2001) }],
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -241,7 +241,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 skills: [{ name: 'a'.repeat(101) }],
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -250,7 +250,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 languages: [{ language: 'a'.repeat(101), proficiency: 'C2' as const }],
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -259,7 +259,7 @@ describe('cvFormSchema', () => {
                 ...validForm,
                 gdprConsent: { enabled: true, companyName: 'a'.repeat(201) },
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(false);
         });
 
@@ -274,7 +274,7 @@ describe('cvFormSchema', () => {
                 },
                 skills: [{ name: 'a'.repeat(100) }],
             };
-            const result = cvFormSchema.safeParse(data);
+            const result = resumeFormSchema.safeParse(data);
             expect(result.success).toBe(true);
         });
     });
@@ -289,7 +289,7 @@ describe('cvFormSchema', () => {
                 email: '',
             },
         };
-        const result = cvFormSchema.safeParse(data);
+        const result = resumeFormSchema.safeParse(data);
         expect(result.success).toBe(false);
         if (!result.success) {
             expect(result.error.issues.length).toBeGreaterThanOrEqual(3);

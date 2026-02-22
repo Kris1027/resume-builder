@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { VeterinaryTemplate } from '@/components/templates/veterinary-template';
-import { sampleVeterinaryCVData } from '@/data/sample-cv-data';
-import { sampleVeterinaryCVDataPl } from '@/data/sample-cv-data-pl';
+import { sampleVeterinaryResumeData } from '@/data/sample-resume-data';
+import { sampleVeterinaryResumeDataPl } from '@/data/sample-resume-data-pl';
 import { TemplateCardPreview } from './template-card-preview';
 
 export const VeterinaryPreview = () => {
@@ -11,7 +11,7 @@ export const VeterinaryPreview = () => {
     return (
         <TemplateCardPreview>
             <VeterinaryTemplate
-                data={isPolish ? sampleVeterinaryCVDataPl : sampleVeterinaryCVData}
+                data={isPolish ? sampleVeterinaryResumeDataPl : sampleVeterinaryResumeData}
             />
         </TemplateCardPreview>
     );

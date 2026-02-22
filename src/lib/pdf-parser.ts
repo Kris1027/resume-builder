@@ -1,4 +1,4 @@
-import type { CVFormValues, LanguageLevelProps } from '@/types/form-types';
+import type { ResumeFormValues, LanguageLevelProps } from '@/types/form-types';
 import type { TemplateId } from '@/lib/template-ids';
 import i18n from '@/i18n/config';
 
@@ -55,9 +55,9 @@ export function detectTemplate(text: string): TemplateId {
 }
 
 /**
- * Parse CV data from extracted PDF text
+ * Parse resume data from extracted PDF text
  */
-export function parseCVFromText(text: string, templateId: TemplateId): CVFormValues {
+export function parseResumeFromText(text: string, templateId: TemplateId): ResumeFormValues {
     const lines = text
         .split(/\n|\s{2,}/)
         .map((l) => l.trim())
@@ -77,8 +77,8 @@ export function parseCVFromText(text: string, templateId: TemplateId): CVFormVal
 /**
  * Parse the Developer template format
  */
-function parseDeveloperTemplate(lines: string[]): CVFormValues {
-    const result = createEmptyCV('developer');
+function parseDeveloperTemplate(lines: string[]): ResumeFormValues {
+    const result = createEmptyResume('developer');
 
     // Find section markers
     const workExpIndex = lines.findIndex((l) => l.includes('// WORK EXPERIENCE'));
@@ -145,8 +145,8 @@ function parseDeveloperTemplate(lines: string[]): CVFormValues {
 /**
  * Parse the Default template format
  */
-function parseDefaultTemplate(lines: string[]): CVFormValues {
-    const result = createEmptyCV('default');
+function parseDefaultTemplate(lines: string[]): ResumeFormValues {
+    const result = createEmptyResume('default');
 
     // Find section markers (uppercase headers)
     const profExpIndex = lines.findIndex(
@@ -217,8 +217,8 @@ function parseDefaultTemplate(lines: string[]): CVFormValues {
 /**
  * Parse the Veterinary template format
  */
-function parseVeterinaryTemplate(lines: string[]): CVFormValues {
-    const result = createEmptyCV('veterinary');
+function parseVeterinaryTemplate(lines: string[]): ResumeFormValues {
+    const result = createEmptyResume('veterinary');
 
     // Find section markers
     const workExpIndex = lines.findIndex((l) => l.includes('Work Experience'));
@@ -289,8 +289,8 @@ function parseVeterinaryTemplate(lines: string[]): CVFormValues {
 /**
  * Parse header/contact information
  */
-function parseHeaderInfo(lines: string[]): CVFormValues['personalInfo'] {
-    const info: CVFormValues['personalInfo'] = {
+function parseHeaderInfo(lines: string[]): ResumeFormValues['personalInfo'] {
+    const info: ResumeFormValues['personalInfo'] = {
         firstName: '',
         lastName: '',
         location: '',
@@ -384,9 +384,9 @@ function parseHeaderInfo(lines: string[]): CVFormValues['personalInfo'] {
 /**
  * Parse work experience entries
  */
-function parseExperiences(lines: string[]): CVFormValues['experiences'] {
-    const experiences: CVFormValues['experiences'] = [];
-    let currentExp: CVFormValues['experiences'][0] | null = null;
+function parseExperiences(lines: string[]): ResumeFormValues['experiences'] {
+    const experiences: ResumeFormValues['experiences'] = [];
+    let currentExp: ResumeFormValues['experiences'][0] | null = null;
     let descriptionLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
@@ -453,9 +453,9 @@ function parseExperiences(lines: string[]): CVFormValues['experiences'] {
 /**
  * Parse education entries
  */
-function parseEducation(lines: string[]): CVFormValues['education'] {
-    const education: CVFormValues['education'] = [];
-    let currentEdu: CVFormValues['education'][0] | null = null;
+function parseEducation(lines: string[]): ResumeFormValues['education'] {
+    const education: ResumeFormValues['education'] = [];
+    let currentEdu: ResumeFormValues['education'][0] | null = null;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -526,8 +526,8 @@ function parseEducation(lines: string[]): CVFormValues['education'] {
 /**
  * Parse skills from skill tags/list
  */
-function parseSkills(lines: string[]): CVFormValues['skills'] {
-    const skills: CVFormValues['skills'] = [];
+function parseSkills(lines: string[]): ResumeFormValues['skills'] {
+    const skills: ResumeFormValues['skills'] = [];
     const seenSkills = new Set<string>();
 
     for (const line of lines) {
@@ -553,8 +553,8 @@ function parseSkills(lines: string[]): CVFormValues['skills'] {
 /**
  * Parse language entries with proficiency
  */
-function parseLanguages(lines: string[]): CVFormValues['languages'] {
-    const languages: CVFormValues['languages'] = [];
+function parseLanguages(lines: string[]): ResumeFormValues['languages'] {
+    const languages: ResumeFormValues['languages'] = [];
     const validProficiencies: LanguageLevelProps[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'NATIVE'];
 
     for (const line of lines) {
@@ -594,8 +594,8 @@ function parseLanguages(lines: string[]): CVFormValues['languages'] {
 /**
  * Parse interests from tags/list
  */
-function parseInterests(lines: string[]): CVFormValues['interests'] {
-    const interests: CVFormValues['interests'] = [];
+function parseInterests(lines: string[]): ResumeFormValues['interests'] {
+    const interests: ResumeFormValues['interests'] = [];
     const seenInterests = new Set<string>();
 
     for (const line of lines) {
@@ -619,7 +619,7 @@ function parseInterests(lines: string[]): CVFormValues['interests'] {
 
 // Helper functions
 
-function createEmptyCV(templateId: TemplateId): CVFormValues {
+function createEmptyResume(templateId: TemplateId): ResumeFormValues {
     return {
         templateId,
         personalInfo: {
@@ -721,20 +721,20 @@ function isCommonWord(word: string): boolean {
 }
 
 /**
- * Extract CV data from PDF metadata (keywords field)
+ * Extract resume data from PDF metadata (keywords field)
  */
-export async function extractCVDataFromMetadata(file: File): Promise<CVFormValues | null> {
+export async function extractResumeDataFromMetadata(file: File): Promise<ResumeFormValues | null> {
     const pdfjsLib = await getPdfjs();
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const metadata = await pdf.getMetadata();
 
-    // Check if CV data is stored in keywords
+    // Check if resume data is stored in keywords
     const info = metadata?.info as Record<string, unknown> | undefined;
     if (info?.Keywords && typeof info.Keywords === 'string') {
         try {
-            const cvData = JSON.parse(info.Keywords);
-            return cvData as CVFormValues;
+            const resumeData = JSON.parse(info.Keywords);
+            return resumeData as ResumeFormValues;
         } catch {
             // Keywords is not valid JSON
         }
@@ -744,15 +744,15 @@ export async function extractCVDataFromMetadata(file: File): Promise<CVFormValue
 }
 
 /**
- * Main function to load CV from PDF file
+ * Main function to load resume from PDF file
  * Only works with PDFs created by this app (with embedded metadata)
  */
-export async function loadCVFromPDF(file: File): Promise<CVFormValues> {
-    const metadataResult = await extractCVDataFromMetadata(file);
+export async function loadResumeFromPDF(file: File): Promise<ResumeFormValues> {
+    const metadataResult = await extractResumeDataFromMetadata(file);
     if (metadataResult) {
         return metadataResult;
     }
 
-    // PDF doesn't have embedded CV data - not created by this app
+    // PDF doesn't have embedded resume data - not created by this app
     throw new Error(i18n.t('dialogs.pdfError.notFromApp'));
 }

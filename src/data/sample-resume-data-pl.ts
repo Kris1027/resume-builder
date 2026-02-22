@@ -1,7 +1,7 @@
-import type { CVData } from '@/types/form-types';
+import type { ResumeData } from '@/types/form-types';
 
 // Developer-focused sample data (for Developer template) - Polish version
-export const sampleCVDataPl: CVData = {
+export const sampleResumeDataPl: ResumeData = {
     personalInfo: {
         firstName: 'Michał',
         lastName: 'Nowak',
@@ -89,7 +89,7 @@ export const sampleCVDataPl: CVData = {
 };
 
 // Generic professional sample data (for Default template) - Polish version
-export const sampleDefaultCVDataPl: CVData = {
+export const sampleDefaultResumeDataPl: ResumeData = {
     personalInfo: {
         firstName: 'Anna',
         lastName: 'Wiśniewska',
@@ -182,7 +182,7 @@ export const sampleDefaultCVDataPl: CVData = {
 };
 
 // Veterinary professional sample data (for Veterinary template) - Polish version
-export const sampleVeterinaryCVDataPl: CVData = {
+export const sampleVeterinaryResumeDataPl: ResumeData = {
     personalInfo: {
         firstName: 'Katarzyna',
         lastName: 'Kowalska',

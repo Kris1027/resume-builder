@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { DeveloperTemplate } from '@/components/templates/developer-template';
-import { sampleCVData } from '@/data/sample-cv-data';
-import { sampleCVDataPl } from '@/data/sample-cv-data-pl';
+import { sampleResumeData } from '@/data/sample-resume-data';
+import { sampleResumeDataPl } from '@/data/sample-resume-data-pl';
 import { TemplateCardPreview } from './template-card-preview';
 
 export const DeveloperPreview = () => {
@@ -10,7 +10,7 @@ export const DeveloperPreview = () => {
 
     return (
         <TemplateCardPreview>
-            <DeveloperTemplate data={isPolish ? sampleCVDataPl : sampleCVData} />
+            <DeveloperTemplate data={isPolish ? sampleResumeDataPl : sampleResumeData} />
         </TemplateCardPreview>
     );
 };
