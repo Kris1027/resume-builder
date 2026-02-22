@@ -244,7 +244,7 @@
         "pdfError": {
             "title": "Unable to Load PDF",
             "ok": "OK",
-            "notFromApp": "This PDF was not created by CV Builder. Only PDFs exported from this application can be loaded. You can fill out the form manually instead.",
+            "notFromApp": "This PDF was not created by Resume Builder. Only PDFs exported from this application can be loaded. You can fill out the form manually instead.",
             "unexpected": "An unexpected error occurred while loading the PDF."
         }
     },
@@ -353,7 +353,7 @@
         "reload": "Reload",
         "close": "Close",
         "install": "Install app",
-        "installDescription": "Install CV Builder for quick access and offline use",
+        "installDescription": "Install Resume Builder for quick access and offline use",
         "offline": "You're offline — all features still work"
     }
 }

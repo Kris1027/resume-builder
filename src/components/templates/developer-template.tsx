@@ -1,4 +1,4 @@
-import type { CVData } from '@/types/form-types';
+import type { ResumeData } from '@/types/form-types';
 import { Mail, Phone, Globe, MapPin, Github, Linkedin } from 'lucide-react';
 import { formatWebsiteDisplay, formatGithubDisplay, formatLinkedinDisplay } from '@/lib/utils';
 import { DescriptionList } from '@/components/description-list';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { formatCVDate, formatCVYear } from '@/lib/date-utils';
 
 interface DeveloperTemplateProps {
-    data: CVData;
+    data: ResumeData;
 }
 
 export function DeveloperTemplate({ data }: DeveloperTemplateProps) {

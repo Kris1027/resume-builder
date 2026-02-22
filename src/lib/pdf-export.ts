@@ -20,7 +20,7 @@ export interface PDFExportOptions {
     filename?: string;
     scale?: number;
     singlePage?: boolean;
-    cvData?: string; // JSON string of CV data to embed in PDF
+    resumeData?: string; // JSON string of resume data to embed in PDF
     imageQuality?: number; // JPEG quality 0-1 (default 0.92)
     compression?: 'NONE' | 'FAST' | 'MEDIUM' | 'SLOW'; // Image compression level (default 'MEDIUM')
 }
@@ -146,7 +146,7 @@ export async function exportToPDF(
         filename = 'cv.pdf',
         scale = 2,
         singlePage = false,
-        cvData,
+        resumeData,
         imageQuality = 0.92, // High quality JPEG (significantly reduces file size compared to PNG)
         compression = 'MEDIUM', // jsPDF compression level
     } = options;
@@ -307,13 +307,13 @@ export async function exportToPDF(
         }
     });
 
-    // Embed CV data as custom metadata if provided
-    if (cvData) {
+    // Embed resume data as custom metadata if provided
+    if (resumeData) {
         pdf.setProperties({
             title: filename.replace('.pdf', ''),
-            subject: 'CV/Resume',
-            creator: 'CV Builder App',
-            keywords: cvData, // Store JSON data in keywords field
+            subject: 'Resume',
+            creator: 'Resume Builder App',
+            keywords: resumeData, // Store JSON data in keywords field
         });
     }
 
@@ -321,8 +321,8 @@ export async function exportToPDF(
     pdf.save(filename);
 }
 
-export function generateCVFilename(firstName?: string, lastName?: string): string {
+export function generateResumeFilename(firstName?: string, lastName?: string): string {
     const nameParts = [firstName, lastName].filter(Boolean);
     const name = nameParts.length > 0 ? nameParts.join('-') : 'my';
-    return `${name}-CV.pdf`;
+    return `${name}-Resume.pdf`;
 }

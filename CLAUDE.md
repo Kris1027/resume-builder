@@ -1,6 +1,6 @@
-# CV Builder
+# Resume Builder
 
-A CV/Resume builder built with React, TypeScript, and TanStack Router. Supports multiple templates, dark mode, i18n (PL/EN), PDF export/import, and PWA with offline support.
+A resume builder built with React, TypeScript, and TanStack Router. Supports multiple templates, dark mode, i18n (PL/EN), PDF export/import, and PWA with offline support.
 
 **Every new feature MUST be documented in this file.**
 
@@ -40,7 +40,7 @@ pnpm pre-commit   # Format + lint + test + tsc + build (run before every commit)
 src/
 ├── components/
 │   ├── ui/                # Base UI components (shadcn/ui style)
-│   ├── form-sections/     # CV form section components
+│   ├── form-sections/     # Resume form section components
 │   │   ├── personal-info-section.tsx
 │   │   ├── experience-section.tsx
 │   │   ├── education-section.tsx
@@ -48,23 +48,23 @@ src/
 │   │   ├── languages-section.tsx
 │   │   ├── interests-section.tsx
 │   │   └── gdpr-consent-section.tsx
-│   ├── templates/         # CV render templates (developer, default, veterinary)
+│   ├── templates/         # Resume render templates (developer, default, veterinary)
 │   ├── template-previews/ # Template preview cards
 │   ├── pwa-reload-prompt.tsx   # SW update notification
 │   ├── pwa-install-prompt.tsx  # Browser install prompt
 │   └── offline-indicator.tsx   # Offline status banner
 ├── contexts/              # React Context providers (theme)
-├── data/                  # Sample data, type interfaces for CV data
+├── data/                  # Sample data, type interfaces for resume data
 ├── hooks/                 # Custom hooks (use-theme)
 ├── lib/                   # Utilities (pdf-parser, helpers)
 ├── locales/               # i18n translations (en/, pl/)
 ├── pages/                 # Page components
 │   ├── builder-page.tsx   # Main form builder
-│   ├── preview-page.tsx   # CV preview + PDF export
+│   ├── preview-page.tsx   # Resume preview + PDF export
 │   ├── templates-page.tsx # Template gallery
 │   └── template-page.tsx  # Single template preview
 ├── routes/                # TanStack Router route definitions
-├── schemas/               # Zod validation schemas (cv-schema)
+├── schemas/               # Zod validation schemas (resume-schema)
 └── types/                 # TypeScript types (form-types, form-component-types, theme)
 ```
 
@@ -75,8 +75,8 @@ src/
 | `/`                      | Home page                   |
 | `/templates`             | Template selection gallery  |
 | `/templates/:templateId` | Individual template preview |
-| `/builder`               | CV form builder             |
-| `/preview`               | CV preview with PDF export  |
+| `/builder`               | Resume form builder         |
+| `/preview`               | Resume preview + PDF export |
 
 ## Tech Stack
 
@@ -136,7 +136,7 @@ src/
 
 ### Data Flow
 
-- Form data stored in localStorage under key `cvData` (+ `cvData_backup`)
+- Form data stored in localStorage under key `resumeData` (+ `resumeData_backup`)
 - Auto-save every 30 seconds, manual save button available
 - Template selection passed via URL query param `?templateId=`
 
@@ -159,8 +159,8 @@ Types defined in `/src/types/form-types.ts`:
 
 ### Validation
 
-- Centralized Zod schemas in `/src/schemas/cv-schema.ts` — single source of truth
-- Wired into TanStack Form via `validators: { onChange: cvFormSchema }`
+- Centralized Zod schemas in `/src/schemas/resume-schema.ts` — single source of truth
+- Wired into TanStack Form via `validators: { onChange: resumeFormSchema }`
 - Field errors exposed via `field.state.meta.errors` and rendered inline using `<FieldError>` component (`/src/components/ui/field-error.tsx`)
 - Error messages are i18n keys (e.g., `validation.firstNameRequired`) translated at render time
 - Errors display only after field is touched (`isTouched` check)
@@ -172,7 +172,7 @@ Types defined in `/src/types/form-types.ts`:
 
 Form section components accept a `FormApi` type from `/src/types/form-component-types.ts`. This file uses ESLint-disabled `any` internally for TanStack Form flexibility.
 
-## CV Templates
+## Resume Templates
 
 Three templates, each in `/src/components/templates/`:
 
@@ -186,7 +186,7 @@ Google Fonts are imported in `/src/index.css`. Atkinson Hyperlegible is used for
 
 ### Critical Template Rules
 
-- **CV templates MUST always have white background** — dark mode only affects surrounding UI
+- **Resume templates MUST always have white background** — dark mode only affects surrounding UI
 - **All templates must be print-optimized** with proper page breaks
 - **Language proficiency** uses European framework: A1, A2, B1, B2, C1, C2, NATIVE
 - **New sections** added to one template must be added to all three
@@ -215,7 +215,7 @@ The PDF parser (`/src/lib/pdf-parser.ts`) detects templates by section markers:
 
 ## GDPR Consent Clause
 
-- Toggle in builder form enables/disables the clause on the CV
+- Toggle in builder form enables/disables the clause on the resume
 - With company name: uses `cv.gdprConsent` translation (mentions company by name)
 - Without company name: uses `cv.gdprConsentGeneric` translation (generic clause)
 - Rendered at the bottom of all three templates when enabled
@@ -235,7 +235,7 @@ Page transitions rely on CSS entrance animations — no View Transition API (dis
 - **Micro-interactions**: `.hover-lift` class for button/card hover (scale + shadow)
 - **Accessibility**: All animations disabled when `prefers-reduced-motion: reduce` is set
 - **Browser support**: Modern browsers. Animations gracefully degrade with `prefers-reduced-motion`.
-- CV templates are NOT animated — they stay print-clean with white backgrounds
+- Resume templates are NOT animated — they stay print-clean with white backgrounds
 
 ### Scroll-linked Parallax & whileInView
 
@@ -254,7 +254,7 @@ Page transitions rely on CSS entrance animations — no View Transition API (dis
 - **Head management**: TanStack Router `head()` property + `<HeadContent />` in root layout
 - **Constants**: `/src/lib/seo.ts` — `SITE_URL` (from `VITE_SITE_URL` env var), `SEO_DEFAULTS`, `OG_DEFAULTS`, `TEMPLATE_NAMES`
 - **Per-route titles**: Each route defines `head()` with unique `title`, `og:title`, `twitter:title`, and `canonical` link
-- **Title convention**: `Page Name | CV Builder` (child routes), `CV Builder - Create Professional Resumes in Minutes` (home)
+- **Title convention**: `Page Name | Resume Builder` (child routes), `Resume Builder - Create Professional Resumes in Minutes` (home)
 - **Static fallbacks**: `index.html` contains static meta/OG/Twitter tags for crawlers that don't execute JS
 - **JSON-LD**: Schema.org `WebApplication` structured data in root route `head()` via `script:ld+json`
 - **Open Graph image**: `/public/og-image.png` (1200x630)
@@ -282,7 +282,7 @@ All three are mounted in `root-layout.tsx` alongside `<PrivacyNotice />`. UI fol
 
 ## PDF Import
 
-- Uses `pdfjs-dist` to extract CV data from PDF metadata (Keywords field)
+- Uses `pdfjs-dist` to extract resume data from PDF metadata (Keywords field)
 - Falls back to raw text parsing if no metadata found
 - Only works reliably with PDFs generated by this application
 - Entry point: "Load PDF" button in builder page header

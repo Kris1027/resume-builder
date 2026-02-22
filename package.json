@@ -1,17 +1,17 @@
 {
-    "name": "cv-builder",
+    "name": "resume-builder",
     "private": true,
     "version": "0.0.0",
-    "description": "A modern CV/Resume builder with multiple templates, dark mode, i18n, and PDF export",
+    "description": "A modern resume builder with multiple templates, dark mode, i18n, and PDF export",
     "author": "Kris1027",
     "license": "SEE LICENSE IN LICENSE",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Kris1027/cv-builder.git"
+        "url": "https://github.com/Kris1027/resume-builder.git"
     },
-    "homepage": "https://github.com/Kris1027/cv-builder",
+    "homepage": "https://github.com/Kris1027/resume-builder",
     "bugs": {
-        "url": "https://github.com/Kris1027/cv-builder/issues"
+        "url": "https://github.com/Kris1027/resume-builder/issues"
     },
     "keywords": [
         "cv",

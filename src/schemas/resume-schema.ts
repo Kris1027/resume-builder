@@ -56,7 +56,7 @@ const gdprConsentSchema = z.object({
     companyName: z.string().max(200, 'validation.maxLength'),
 });
 
-export const cvFormSchema = z.object({
+export const resumeFormSchema = z.object({
     templateId: z.enum(TEMPLATE_IDS),
     personalInfo: personalInfoSchema,
     experiences: z.array(experienceSchema),
@@ -67,4 +67,4 @@ export const cvFormSchema = z.object({
     gdprConsent: gdprConsentSchema,
 });
 
-export type CVFormValues = z.infer<typeof cvFormSchema>;
+export type ResumeFormValues = z.infer<typeof resumeFormSchema>;

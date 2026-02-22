@@ -6,7 +6,7 @@ vi.mock('pdfjs-dist', () => ({
     getDocument: vi.fn(),
 }));
 
-import { detectTemplate, parseCVFromText } from './pdf-parser';
+import { detectTemplate, parseResumeFromText } from './pdf-parser';
 
 describe('detectTemplate', () => {
     it('detects developer template by // WORK EXPERIENCE', () => {
@@ -34,7 +34,7 @@ describe('detectTemplate', () => {
     });
 });
 
-describe('parseCVFromText — developer template', () => {
+describe('parseResumeFromText — developer template', () => {
     const developerText = [
         'John Doe',
         'Senior Developer',
@@ -59,19 +59,19 @@ describe('parseCVFromText — developer template', () => {
     ].join('\n');
 
     it('parses personal info', () => {
-        const result = parseCVFromText(developerText, 'developer');
+        const result = parseResumeFromText(developerText, 'developer');
         expect(result.personalInfo.firstName).toBe('John');
         expect(result.personalInfo.lastName).toBe('Doe');
         expect(result.personalInfo.email).toBe('john@example.com');
     });
 
     it('sets templateId to developer', () => {
-        const result = parseCVFromText(developerText, 'developer');
+        const result = parseResumeFromText(developerText, 'developer');
         expect(result.templateId).toBe('developer');
     });
 
     it('parses experiences', () => {
-        const result = parseCVFromText(developerText, 'developer');
+        const result = parseResumeFromText(developerText, 'developer');
         expect(result.experiences.length).toBeGreaterThanOrEqual(1);
         expect(result.experiences[0].company).toBe('ACME Corp');
         expect(result.experiences[0].position).toBe('Frontend Developer');
@@ -79,27 +79,27 @@ describe('parseCVFromText — developer template', () => {
     });
 
     it('parses skills from TECH STACK', () => {
-        const result = parseCVFromText(developerText, 'developer');
+        const result = parseResumeFromText(developerText, 'developer');
         const skillNames = result.skills.map((s) => s.name);
         expect(skillNames).toContain('TypeScript');
         expect(skillNames).toContain('React');
     });
 
     it('parses languages with proficiency', () => {
-        const result = parseCVFromText(developerText, 'developer');
+        const result = parseResumeFromText(developerText, 'developer');
         expect(result.languages.length).toBeGreaterThanOrEqual(1);
         const polish = result.languages.find((l) => l.language === 'Polish');
         expect(polish?.proficiency).toBe('NATIVE');
     });
 
     it('parses interests', () => {
-        const result = parseCVFromText(developerText, 'developer');
+        const result = parseResumeFromText(developerText, 'developer');
         const interestNames = result.interests.map((i) => i.name);
         expect(interestNames).toContain('Hiking');
     });
 });
 
-describe('parseCVFromText — default template', () => {
+describe('parseResumeFromText — default template', () => {
     const defaultText = [
         'Jane Smith',
         'Product Manager',
@@ -120,24 +120,24 @@ describe('parseCVFromText — default template', () => {
     ].join('\n');
 
     it('parses with templateId default', () => {
-        const result = parseCVFromText(defaultText, 'default');
+        const result = parseResumeFromText(defaultText, 'default');
         expect(result.templateId).toBe('default');
     });
 
     it('parses personal info', () => {
-        const result = parseCVFromText(defaultText, 'default');
+        const result = parseResumeFromText(defaultText, 'default');
         expect(result.personalInfo.firstName).toBe('Jane');
         expect(result.personalInfo.lastName).toBe('Smith');
     });
 
     it('parses Core Competencies as skills', () => {
-        const result = parseCVFromText(defaultText, 'default');
+        const result = parseResumeFromText(defaultText, 'default');
         const skillNames = result.skills.map((s) => s.name);
         expect(skillNames).toContain('Leadership');
     });
 });
 
-describe('parseCVFromText — veterinary template', () => {
+describe('parseResumeFromText — veterinary template', () => {
     const vetText = [
         'Anna Kowalska',
         'Veterinarian',
@@ -158,18 +158,18 @@ describe('parseCVFromText — veterinary template', () => {
     ].join('\n');
 
     it('parses with templateId veterinary', () => {
-        const result = parseCVFromText(vetText, 'veterinary');
+        const result = parseResumeFromText(vetText, 'veterinary');
         expect(result.templateId).toBe('veterinary');
     });
 
     it('parses personal info', () => {
-        const result = parseCVFromText(vetText, 'veterinary');
+        const result = parseResumeFromText(vetText, 'veterinary');
         expect(result.personalInfo.firstName).toBe('Anna');
         expect(result.personalInfo.lastName).toBe('Kowalska');
     });
 
     it('parses skills section', () => {
-        const result = parseCVFromText(vetText, 'veterinary');
+        const result = parseResumeFromText(vetText, 'veterinary');
         const skillNames = result.skills.map((s) => s.name);
         expect(skillNames).toContain('Surgery');
     });

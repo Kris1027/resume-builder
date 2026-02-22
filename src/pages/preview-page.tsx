@@ -5,7 +5,7 @@ import { DeveloperTemplate } from '@/components/templates/developer-template';
 import { DefaultTemplate } from '@/components/templates/default-template';
 import { VeterinaryTemplate } from '@/components/templates/veterinary-template';
 import { ScaleToFitContainer } from '@/components/scale-to-fit-container';
-import type { CVData } from '@/types/form-types';
+import type { ResumeData } from '@/types/form-types';
 import {
     ArrowLeft,
     Download,
@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import { exportToPDF, generateCVFilename } from '@/lib/pdf-export';
+import { exportToPDF, generateResumeFilename } from '@/lib/pdf-export';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'motion/react';
 import { useParallax } from '@/hooks/use-parallax';
@@ -46,7 +46,7 @@ export const PreviewPage = () => {
     const bgDots = useParallax({ yRange: 15 });
     const bgShapes = useParallax({ yRange: 40 });
 
-    const [cvData, setCvData] = useState<CVData | null>(null);
+    const [resumeData, setResumeData] = useState<ResumeData | null>(null);
     const [isExporting, setIsExporting] = useState(false);
     const [exportError, setExportError] = useState<string | null>(null);
     const [singlePageMode, setSinglePageMode] = useState(false);
@@ -61,17 +61,17 @@ export const PreviewPage = () => {
 
     useEffect(() => {
         // Get data from localStorage
-        const storedData = safeStorage.getItem('cvData');
+        const storedData = safeStorage.getItem('resumeData');
         if (storedData) {
             let parsedData;
             try {
                 parsedData = JSON.parse(storedData);
             } catch {
-                if (import.meta.env.DEV) console.warn('Failed to parse stored CV data');
+                if (import.meta.env.DEV) console.warn('Failed to parse stored resume data');
                 return;
             }
             // Ensure all arrays have default values
-            const transformedData: CVData = {
+            const transformedData: ResumeData = {
                 personalInfo: parsedData.personalInfo,
                 experiences: parsedData.experiences || [],
                 education: parsedData.education || [],
@@ -80,13 +80,13 @@ export const PreviewPage = () => {
                 interests: parsedData.interests || [],
                 gdprConsent: parsedData.gdprConsent,
             };
-            setCvData(transformedData);
+            setResumeData(transformedData);
         }
     }, []);
 
     const handleDownloadPDF = async () => {
         const element = document.getElementById('cv-content');
-        if (!element || !cvData) return;
+        if (!element || !resumeData) return;
 
         setIsExporting(true);
 
@@ -117,14 +117,14 @@ export const PreviewPage = () => {
             // Temporarily disable CSS transform scaling for accurate capture
             disableScaling();
 
-            const filename = generateCVFilename(
-                cvData.personalInfo?.firstName,
-                cvData.personalInfo?.lastName,
+            const filename = generateResumeFilename(
+                resumeData.personalInfo?.firstName,
+                resumeData.personalInfo?.lastName,
             );
             await exportToPDF(element, {
                 filename,
                 singlePage: singlePageMode,
-                cvData: JSON.stringify(cvData),
+                resumeData: JSON.stringify(resumeData),
             });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
@@ -135,7 +135,7 @@ export const PreviewPage = () => {
         }
     };
 
-    if (!cvData) {
+    if (!resumeData) {
         return (
             <div className='relative min-h-screen overflow-hidden'>
                 {/* Background gradient mesh */}
@@ -354,10 +354,12 @@ export const PreviewPage = () => {
                                 className='overflow-hidden bg-white text-gray-900 shadow-xl'
                                 {...fadeInScale(0.1, shouldReduceMotion)}
                             >
-                                {templateId === 'developer' && <DeveloperTemplate data={cvData} />}
-                                {templateId === 'default' && <DefaultTemplate data={cvData} />}
+                                {templateId === 'developer' && (
+                                    <DeveloperTemplate data={resumeData} />
+                                )}
+                                {templateId === 'default' && <DefaultTemplate data={resumeData} />}
                                 {templateId === 'veterinary' && (
-                                    <VeterinaryTemplate data={cvData} />
+                                    <VeterinaryTemplate data={resumeData} />
                                 )}
                             </motion.div>
                         </ScaleToFitContainer>

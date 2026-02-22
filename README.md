@@ -1,8 +1,8 @@
 <div align="center">
 
-# CV Builder
+# Resume Builder
 
-A modern, intuitive CV/Resume builder with multiple templates, dark mode, i18n, and PDF export.
+A modern, intuitive resume builder with multiple templates, dark mode, i18n, and PDF export.
 
 [![React][React-badge]][React-url]
 [![TypeScript][TypeScript-badge]][TypeScript-url]
@@ -87,8 +87,8 @@ A modern, intuitive CV/Resume builder with multiple templates, dark mode, i18n, 
 ### Installation
 
 ```bash
-git clone https://github.com/Kris1027/cv-builder.git
-cd cv-builder
+git clone https://github.com/Kris1027/resume-builder.git
+cd resume-builder
 pnpm install
 pnpm dev
 ```
@@ -164,7 +164,7 @@ This project is provided for viewing and reference purposes only. No permission 
 
 ## Support
 
-For issues, questions, or suggestions, please [open an issue on GitHub](https://github.com/Kris1027/cv-builder/issues).
+For issues, questions, or suggestions, please [open an issue on GitHub](https://github.com/Kris1027/resume-builder/issues).
 
 <!-- Tech Badges -->
 

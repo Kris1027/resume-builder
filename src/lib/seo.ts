@@ -10,11 +10,11 @@ if (!import.meta.env.VITE_SITE_URL) {
 export const SITE_URL = import.meta.env.VITE_SITE_URL;
 
 export const SEO_DEFAULTS = {
-    siteName: 'CV Builder',
+    siteName: 'Resume Builder',
     description:
-        'Create professional resumes with our free CV builder. Choose from multiple templates, customize your layout, and export to PDF in minutes.',
+        'Create professional resumes with our free resume builder. Choose from multiple templates, customize your layout, and export to PDF in minutes.',
     keywords:
-        'cv builder, resume builder, free cv maker, professional resume, pdf resume, cv templates, resume templates',
+        'resume builder, cv builder, free resume maker, professional resume, pdf resume, cv templates, resume templates',
 } as const;
 
 export const OG_DEFAULTS = {

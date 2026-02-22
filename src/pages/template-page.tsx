@@ -3,12 +3,16 @@ import { Button } from '@/components/ui/button';
 import { DeveloperTemplate } from '@/components/templates/developer-template';
 import { DefaultTemplate } from '@/components/templates/default-template';
 import { VeterinaryTemplate } from '@/components/templates/veterinary-template';
-import { sampleCVData, sampleDefaultCVData, sampleVeterinaryCVData } from '@/data/sample-cv-data';
 import {
-    sampleCVDataPl,
-    sampleDefaultCVDataPl,
-    sampleVeterinaryCVDataPl,
-} from '@/data/sample-cv-data-pl';
+    sampleResumeData,
+    sampleDefaultResumeData,
+    sampleVeterinaryResumeData,
+} from '@/data/sample-resume-data';
+import {
+    sampleResumeDataPl,
+    sampleDefaultResumeDataPl,
+    sampleVeterinaryResumeDataPl,
+} from '@/data/sample-resume-data-pl';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
@@ -44,17 +48,19 @@ export function TemplatePage() {
     const renderTemplate = () => {
         switch (templateId) {
             case 'developer':
-                return <DeveloperTemplate data={isPolish ? sampleCVDataPl : sampleCVData} />;
+                return (
+                    <DeveloperTemplate data={isPolish ? sampleResumeDataPl : sampleResumeData} />
+                );
             case 'default':
                 return (
                     <DefaultTemplate
-                        data={isPolish ? sampleDefaultCVDataPl : sampleDefaultCVData}
+                        data={isPolish ? sampleDefaultResumeDataPl : sampleDefaultResumeData}
                     />
                 );
             case 'veterinary':
                 return (
                     <VeterinaryTemplate
-                        data={isPolish ? sampleVeterinaryCVDataPl : sampleVeterinaryCVData}
+                        data={isPolish ? sampleVeterinaryResumeDataPl : sampleVeterinaryResumeData}
                     />
                 );
             default:

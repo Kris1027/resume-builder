@@ -9,7 +9,7 @@ import { GdprConsentSection } from '@/components/form-sections/gdpr-consent-sect
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import type {
-    CVFormValues,
+    ResumeFormValues,
     EducationProps,
     ExperienceProps,
     InterestProps,
@@ -19,7 +19,7 @@ import type {
     SkillProps,
 } from '@/types/form-types';
 import { useForm } from '@tanstack/react-form';
-import { cvFormSchema } from '@/schemas/cv-schema';
+import { resumeFormSchema } from '@/schemas/resume-schema';
 import {
     ArrowLeft,
     CheckCircle,
@@ -41,7 +41,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useState, useRef, useEffect } from 'react';
-import { loadCVFromPDF } from '@/lib/pdf-parser';
+import { loadResumeFromPDF } from '@/lib/pdf-parser';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'motion/react';
@@ -109,14 +109,14 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
     // Get initial values - load from localStorage if available, otherwise defaults
     const getInitialValues = () => {
-        const storedData = safeStorage.getItem('cvData');
+        const storedData = safeStorage.getItem('resumeData');
         if (storedData) {
             let parsedData;
             try {
                 parsedData = JSON.parse(storedData);
             } catch {
                 if (import.meta.env.DEV)
-                    console.warn('Failed to parse stored CV data, starting fresh');
+                    console.warn('Failed to parse stored resume data, starting fresh');
                 return {
                     templateId: activeTemplateId,
                     personalInfo: emptyPersonalInfo as PersonalInfoProps,
@@ -161,15 +161,15 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const form = useForm({
         defaultValues: getInitialValues(),
         validators: {
-            onChange: cvFormSchema,
+            onChange: resumeFormSchema,
         },
         onSubmit: async ({ value }) => {
             setIsSaving(true);
             // Store data in localStorage for persistence
             const json = JSON.stringify(value);
-            const ok = safeStorage.setItem('cvData', json);
+            const ok = safeStorage.setItem('resumeData', json);
             const now = new Date();
-            safeStorage.setItem('cvData_lastSaved', now.toISOString());
+            safeStorage.setItem('resumeData_lastSaved', now.toISOString());
             lastSavedJsonRef.current = json;
             setSaveError(!ok);
             setIsAutoSaved(false);
@@ -194,13 +194,13 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     // Auto-save every 30 seconds
     useEffect(() => {
         const interval = setInterval(() => {
-            const formData = form.state.values as CVFormValues;
+            const formData = form.state.values as ResumeFormValues;
             const json = JSON.stringify(formData);
             if (json === lastSavedJsonRef.current) return;
 
-            const ok = safeStorage.setItem('cvData', json);
+            const ok = safeStorage.setItem('resumeData', json);
             const now = new Date();
-            safeStorage.setItem('cvData_lastSaved', now.toISOString());
+            safeStorage.setItem('resumeData_lastSaved', now.toISOString());
             lastSavedJsonRef.current = json;
             setSaveError(!ok);
             setIsAutoSaved(true);
@@ -213,12 +213,12 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     // Manual save function
     const handleManualSave = () => {
         setIsSaving(true);
-        const formData = form.state.values as CVFormValues;
+        const formData = form.state.values as ResumeFormValues;
         const json = JSON.stringify(formData);
-        const ok = safeStorage.setItem('cvData', json);
-        safeStorage.setItem('cvData_backup', json);
+        const ok = safeStorage.setItem('resumeData', json);
+        safeStorage.setItem('resumeData_backup', json);
         const now = new Date();
-        safeStorage.setItem('cvData_lastSaved', now.toISOString());
+        safeStorage.setItem('resumeData_lastSaved', now.toISOString());
         lastSavedJsonRef.current = json;
         setSaveError(!ok);
         setIsAutoSaved(false);
@@ -228,8 +228,8 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
     // Reset form function — keeps backup intact for recovery
     const handleReset = () => {
-        safeStorage.removeItem('cvData');
-        safeStorage.removeItem('cvData_lastSaved');
+        safeStorage.removeItem('resumeData');
+        safeStorage.removeItem('resumeData_lastSaved');
         setLastSaved(null);
         form.reset({
             templateId: activeTemplateId,
@@ -257,30 +257,30 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
         setIsLoadingPDF(true);
         try {
-            const cvData = await loadCVFromPDF(file);
+            const resumeData = await loadResumeFromPDF(file);
 
             // Normalize PDF data by merging with defaults to backfill missing keys
-            const normalizedPersonalInfo = { ...emptyPersonalInfo, ...cvData.personalInfo };
-            const normalizedGdprConsent = { ...emptyGdprConsent, ...cvData.gdprConsent };
+            const normalizedPersonalInfo = { ...emptyPersonalInfo, ...resumeData.personalInfo };
+            const normalizedGdprConsent = { ...emptyGdprConsent, ...resumeData.gdprConsent };
 
             // Build the complete new form values
-            // PDF metadata (CVData) doesn't include templateId — fall back to
+            // PDF metadata (ResumeData) doesn't include templateId — fall back to
             // the currently active template so form.reset() gets a valid string
             // and the Zod schema doesn't trigger a "fix errors" validation message.
             const newValues = {
-                templateId: cvData.templateId || activeTemplateId,
+                templateId: resumeData.templateId || activeTemplateId,
                 personalInfo: normalizedPersonalInfo,
-                experiences: cvData.experiences ?? [],
-                education: cvData.education ?? [],
-                skills: cvData.skills ?? [],
-                languages: cvData.languages ?? [],
-                interests: cvData.interests ?? [],
+                experiences: resumeData.experiences ?? [],
+                education: resumeData.education ?? [],
+                skills: resumeData.skills ?? [],
+                languages: resumeData.languages ?? [],
+                interests: resumeData.interests ?? [],
                 gdprConsent: normalizedGdprConsent,
             };
 
             // Persist first so getInitialValues() returns matching data on
             // re-render, preventing useForm's update() from overwriting the reset
-            safeStorage.setItem('cvData', JSON.stringify(newValues));
+            safeStorage.setItem('resumeData', JSON.stringify(newValues));
 
             // Reset the form with all values at once — no intermediate
             // validation states and no stale errors
@@ -428,7 +428,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
     // Calculate form progress
     const calculateProgress = () => {
-        const values = form.state.values as CVFormValues;
+        const values = form.state.values as ResumeFormValues;
         let progress = 0;
 
         // Personal info (30%)
