@@ -14,7 +14,7 @@ describe('PrivacyNotice', () => {
         expect(screen.getByText('Your data stays private')).toBeInTheDocument();
         expect(
             screen.getByText(
-                'All your CV data is stored locally in your browser. Nothing is sent to any server.',
+                'All your resume data is stored locally in your browser. Nothing is sent to any server.',
             ),
         ).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Got it' })).toBeInTheDocument();
