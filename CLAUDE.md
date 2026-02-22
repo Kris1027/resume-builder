@@ -1,6 +1,6 @@
-# CV Builder
+# Resume Builder
 
-A CV/Resume builder built with React, TypeScript, and TanStack Router. Supports multiple templates, dark mode, i18n (PL/EN), PDF export/import, and PWA with offline support.
+A resume builder built with React, TypeScript, and TanStack Router. Supports multiple templates, dark mode, i18n (PL/EN), PDF export/import, and PWA with offline support.
 
 **Every new feature MUST be documented in this file.**
 
@@ -254,7 +254,7 @@ Page transitions rely on CSS entrance animations — no View Transition API (dis
 - **Head management**: TanStack Router `head()` property + `<HeadContent />` in root layout
 - **Constants**: `/src/lib/seo.ts` — `SITE_URL` (from `VITE_SITE_URL` env var), `SEO_DEFAULTS`, `OG_DEFAULTS`, `TEMPLATE_NAMES`
 - **Per-route titles**: Each route defines `head()` with unique `title`, `og:title`, `twitter:title`, and `canonical` link
-- **Title convention**: `Page Name | CV Builder` (child routes), `CV Builder - Create Professional Resumes in Minutes` (home)
+- **Title convention**: `Page Name | Resume Builder` (child routes), `Resume Builder - Create Professional Resumes in Minutes` (home)
 - **Static fallbacks**: `index.html` contains static meta/OG/Twitter tags for crawlers that don't execute JS
 - **JSON-LD**: Schema.org `WebApplication` structured data in root route `head()` via `script:ld+json`
 - **Open Graph image**: `/public/og-image.png` (1200x630)

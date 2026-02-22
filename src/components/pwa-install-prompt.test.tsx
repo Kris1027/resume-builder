@@ -33,7 +33,7 @@ describe('PwaInstallPrompt', () => {
 
         expect(screen.getByRole('button', { name: 'Install app' })).toBeInTheDocument();
         expect(
-            screen.getByText('Install CV Builder for quick access and offline use'),
+            screen.getByText('Install Resume Builder for quick access and offline use'),
         ).toBeInTheDocument();
     });
 

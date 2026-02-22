@@ -244,7 +244,7 @@
         "pdfError": {
             "title": "Nie można wczytać PDF",
             "ok": "OK",
-            "notFromApp": "Ten plik PDF nie został utworzony przez CV Builder. Można wczytać jedynie pliki PDF wyeksportowane z tej aplikacji. Możesz zamiast tego wypełnić formularz ręcznie.",
+            "notFromApp": "Ten plik PDF nie został utworzony przez Resume Builder. Można wczytać jedynie pliki PDF wyeksportowane z tej aplikacji. Możesz zamiast tego wypełnić formularz ręcznie.",
             "unexpected": "Wystąpił nieoczekiwany błąd podczas wczytywania pliku PDF."
         }
     },
@@ -353,7 +353,7 @@
         "reload": "Odśwież",
         "close": "Zamknij",
         "install": "Zainstaluj aplikację",
-        "installDescription": "Zainstaluj CV Builder, aby mieć szybki dostęp i możliwość pracy offline",
+        "installDescription": "Zainstaluj Resume Builder, aby mieć szybki dostęp i możliwość pracy offline",
         "offline": "Jesteś offline — wszystkie funkcje nadal działają"
     }
 }

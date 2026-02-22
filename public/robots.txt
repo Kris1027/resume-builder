@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://cv-builder.app/sitemap.xml
+Sitemap: https://resume-builder.techkris.eu/sitemap.xml

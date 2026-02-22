@@ -1,4 +1,4 @@
-# Contributing to CV Builder
+# Contributing to Resume Builder
 
 ## Prerequisites
 
@@ -9,8 +9,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/Kris1027/cv-builder.git
-cd cv-builder
+git clone https://github.com/Kris1027/resume-builder.git
+cd resume-builder
 
 # Install dependencies
 pnpm install

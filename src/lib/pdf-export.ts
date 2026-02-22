@@ -312,7 +312,7 @@ export async function exportToPDF(
         pdf.setProperties({
             title: filename.replace('.pdf', ''),
             subject: 'CV/Resume',
-            creator: 'CV Builder App',
+            creator: 'Resume Builder App',
             keywords: cvData, // Store JSON data in keywords field
         });
     }
