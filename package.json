@@ -59,7 +59,7 @@
         "jspdf": "^4.1.0",
         "lucide-react": "^0.542.0",
         "motion": "^12.34.1",
-        "pdfjs-dist": "^5.4.530",
+        "pdfjs-dist": "^5.4.624",
         "react": "^19.1.1",
         "react-day-picker": "^9.9.0",
         "react-dom": "^19.1.1",
