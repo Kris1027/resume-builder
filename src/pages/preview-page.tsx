@@ -20,6 +20,7 @@ import {
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import { exportToPDF, generateResumeFilename } from '@/lib/pdf-export';
+import type { TemplateId } from '@/lib/template-ids';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'motion/react';
 import { useParallax } from '@/hooks/use-parallax';
@@ -85,52 +86,23 @@ export const PreviewPage = () => {
     }, []);
 
     const handleDownloadPDF = async () => {
-        const element = document.getElementById('resume-content');
-        if (!element || !resumeData) return;
+        if (!resumeData) return;
 
         setIsExporting(true);
 
-        // Store original styles for restoration
-        const scaledParent = element.parentElement;
-        const originalStyles = scaledParent
-            ? {
-                  transform: scaledParent.style.transform,
-                  width: scaledParent.style.width,
-              }
-            : null;
-
-        const disableScaling = () => {
-            if (scaledParent && singlePageMode) {
-                scaledParent.style.transform = 'none';
-                scaledParent.style.width = '';
-            }
-        };
-
-        const restoreScaling = () => {
-            if (scaledParent && singlePageMode && originalStyles) {
-                scaledParent.style.transform = originalStyles.transform;
-                scaledParent.style.width = originalStyles.width;
-            }
-        };
-
         try {
-            // Temporarily disable CSS transform scaling for accurate capture
-            disableScaling();
-
             const filename = generateResumeFilename(
                 resumeData.personalInfo?.firstName,
                 resumeData.personalInfo?.lastName,
             );
-            await exportToPDF(element, {
+            await exportToPDF(resumeData, templateId as TemplateId, {
                 filename,
                 singlePage: singlePageMode,
-                resumeData: JSON.stringify(resumeData),
             });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
             setExportError(t('preview.exportError'));
         } finally {
-            restoreScaling();
             setIsExporting(false);
         }
     };
