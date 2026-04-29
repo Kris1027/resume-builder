@@ -1,3 +1,4 @@
+import '@/lib/pdf-fonts';
 import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/types/form-types';
 import { format } from 'date-fns';
@@ -12,13 +13,12 @@ const C = {
     white: '#FFFFFF',
     emerald600: '#059669',
     emerald700: '#047857',
+    emerald800: '#065F46',
     emerald50: '#ECFDF5',
     emerald100: '#D1FAE5',
     emerald200: '#A7F3D0',
     teal600: '#0D9488',
     teal50: '#F0FDFA',
-    orange700: '#C2410C',
-    orange50: '#FFF7ED',
     gray800: '#1F2937',
     gray700: '#374151',
     gray600: '#4B5563',
@@ -27,7 +27,7 @@ const C = {
 } as const;
 
 const styles = StyleSheet.create({
-    page: { fontFamily: 'Helvetica', backgroundColor: C.white, fontSize: 10, color: C.gray800 },
+    page: { fontFamily: 'Lato', backgroundColor: C.white, fontSize: 10, color: C.gray800 },
     header: {
         backgroundColor: C.emerald50,
         borderBottomWidth: 2,
@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     headerName: {
-        fontFamily: 'Helvetica-Bold',
+        fontFamily: 'Merriweather',
+        fontWeight: 700,
         fontSize: 22,
         color: C.gray800,
         textAlign: 'center',
@@ -65,7 +66,8 @@ const styles = StyleSheet.create({
     section: { marginBottom: 14 },
     sectionHeader: {
         fontSize: 10,
-        fontFamily: 'Helvetica-Bold',
+        fontFamily: 'Merriweather',
+        fontWeight: 700,
         color: C.emerald700,
         borderBottomWidth: 1.5,
         borderBottomColor: C.emerald200,
@@ -78,14 +80,14 @@ const styles = StyleSheet.create({
         borderLeftColor: C.emerald200,
         paddingLeft: 10,
     },
-    expPosition: { fontFamily: 'Helvetica-Bold', fontSize: 10, color: C.gray800 },
+    expPosition: { fontFamily: 'Lato', fontWeight: 700, fontSize: 10, color: C.gray800 },
     expMeta: { fontSize: 9, color: C.gray600, marginBottom: 3 },
     expCompany: { fontSize: 9, color: C.emerald700 },
     bulletRow: { flexDirection: 'row', marginBottom: 2 },
     bulletDot: { width: 10, fontSize: 9, color: C.emerald600 },
     bulletText: { flex: 1, fontSize: 9, color: C.gray700, lineHeight: 1.4 },
     eduBlock: { marginBottom: 8 },
-    eduDegree: { fontFamily: 'Helvetica-Bold', fontSize: 10, color: C.gray800 },
+    eduDegree: { fontFamily: 'Lato', fontWeight: 700, fontSize: 10, color: C.gray800 },
     eduInstitution: { fontSize: 9, color: C.emerald700 },
     eduYears: { fontSize: 9, color: C.gray500 },
     card: {
@@ -95,18 +97,19 @@ const styles = StyleSheet.create({
     },
     cardEmerald: { backgroundColor: C.emerald50 },
     cardTeal: { backgroundColor: C.teal50 },
-    cardOrange: { backgroundColor: C.orange50 },
+    cardDeep: { backgroundColor: C.emerald100 },
     cardHeader: {
         fontSize: 9,
-        fontFamily: 'Helvetica-Bold',
+        fontFamily: 'Merriweather',
+        fontWeight: 700,
         color: C.emerald700,
         borderBottomWidth: 1,
         borderBottomColor: C.emerald200,
         paddingBottom: 3,
         marginBottom: 6,
     },
-    cardHeaderTeal: { color: C.teal600, borderBottomColor: C.teal50 },
-    cardHeaderOrange: { color: C.orange700, borderBottomColor: C.orange50 },
+    cardHeaderTeal: { color: C.teal600, borderBottomColor: C.emerald200 },
+    cardHeaderDeep: { color: C.emerald800, borderBottomColor: C.emerald200 },
     skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
     skillTag: {
         backgroundColor: C.emerald100,
@@ -117,12 +120,12 @@ const styles = StyleSheet.create({
         fontSize: 8,
     },
     langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 },
-    langName: { fontFamily: 'Helvetica-Bold', fontSize: 9 },
+    langName: { fontFamily: 'Lato', fontWeight: 700, fontSize: 9 },
     langLevel: { fontSize: 9, color: C.teal600 },
     interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
     interestTag: {
-        backgroundColor: '#FED7AA',
-        color: C.orange700,
+        backgroundColor: C.emerald200,
+        color: C.emerald800,
         borderRadius: 3,
         paddingHorizontal: 5,
         paddingVertical: 2,
@@ -298,8 +301,8 @@ export function VeterinaryPDF({ data }: VeterinaryPDFProps) {
                         )}
 
                         {interests.length > 0 && (
-                            <View style={[styles.card, styles.cardOrange]}>
-                                <Text style={[styles.cardHeader, styles.cardHeaderOrange]}>
+                            <View style={[styles.card, styles.cardDeep]}>
+                                <Text style={[styles.cardHeader, styles.cardHeaderDeep]}>
                                     SPECIAL INTERESTS
                                 </Text>
                                 <View style={styles.interestsWrap}>

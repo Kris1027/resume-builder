@@ -1,3 +1,4 @@
+import '@/lib/pdf-fonts';
 import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/types/form-types';
 import { format } from 'date-fns';
@@ -10,6 +11,7 @@ interface DefaultPDFProps {
 
 const C = {
     white: '#FFFFFF',
+    slateBlue: '#1E40AF',
     gray900: '#111827',
     gray800: '#1F2937',
     gray700: '#374151',
@@ -21,7 +23,7 @@ const C = {
 } as const;
 
 const styles = StyleSheet.create({
-    page: { fontFamily: 'Helvetica', backgroundColor: C.white, fontSize: 10, color: C.gray800 },
+    page: { fontFamily: 'Montserrat', backgroundColor: C.white, fontSize: 10, color: C.gray800 },
     headerBlock: {
         backgroundColor: C.gray50,
         paddingHorizontal: 32,
@@ -34,7 +36,8 @@ const styles = StyleSheet.create({
     headerFirstName: { fontSize: 22, letterSpacing: 2, color: C.gray800 },
     headerLastName: {
         fontSize: 22,
-        fontFamily: 'Helvetica-Bold',
+        fontFamily: 'Montserrat',
+        fontWeight: 700,
         letterSpacing: 2,
         color: C.gray800,
     },
@@ -46,27 +49,28 @@ const styles = StyleSheet.create({
     section: { marginBottom: 14 },
     sectionHeader: {
         fontSize: 9,
-        fontFamily: 'Helvetica-Bold',
+        fontFamily: 'Montserrat',
+        fontWeight: 700,
         letterSpacing: 1.5,
-        color: C.gray700,
+        color: C.slateBlue,
         borderBottomWidth: 1.5,
-        borderBottomColor: C.gray900,
+        borderBottomColor: C.slateBlue,
         paddingBottom: 3,
         marginBottom: 8,
     },
     expBlock: { marginBottom: 10 },
     expTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
-    expPosition: { fontFamily: 'Helvetica-Bold', fontSize: 10 },
+    expPosition: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 10 },
     expDate: { fontSize: 9, color: C.gray500 },
     expCompanyRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 },
-    expCompany: { fontFamily: 'Helvetica-Bold', color: C.gray700, fontSize: 9 },
+    expCompany: { fontFamily: 'Montserrat', fontWeight: 700, color: C.gray700, fontSize: 9 },
     expLocation: { fontSize: 8, color: C.gray500 },
     bulletRow: { flexDirection: 'row', marginBottom: 1.5 },
     bulletDot: { width: 10, fontSize: 9 },
     bulletText: { flex: 1, fontSize: 9, color: C.gray700, lineHeight: 1.4 },
     eduBlock: { marginBottom: 8 },
     eduTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 1 },
-    eduDegree: { fontFamily: 'Helvetica-Bold', fontSize: 10 },
+    eduDegree: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 10 },
     eduYears: { fontSize: 9, color: C.gray500 },
     eduInstitution: { fontSize: 9, color: C.gray700 },
     twoCol: { flexDirection: 'row', gap: 24 },
@@ -83,7 +87,7 @@ const styles = StyleSheet.create({
         color: C.gray700,
     },
     langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 },
-    langName: { fontFamily: 'Helvetica-Bold', fontSize: 9 },
+    langName: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 9 },
     langLevel: { fontSize: 9, color: C.gray500 },
     interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
     interestTag: {

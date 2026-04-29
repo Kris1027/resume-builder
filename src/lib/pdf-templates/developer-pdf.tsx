@@ -1,3 +1,4 @@
+import '@/lib/pdf-fonts';
 import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/types/form-types';
 import { format } from 'date-fns';
@@ -20,9 +21,14 @@ const C = {
 } as const;
 
 const styles = StyleSheet.create({
-    page: { fontFamily: 'Courier', backgroundColor: C.white, fontSize: 10, color: C.gray800 },
+    page: {
+        fontFamily: 'Fira Code',
+        backgroundColor: C.white,
+        fontSize: 10,
+        color: C.gray800,
+    },
     header: { backgroundColor: C.purple, padding: 24, color: C.white },
-    headerName: { fontSize: 24, fontFamily: 'Courier-Bold', marginBottom: 4 },
+    headerName: { fontSize: 24, fontFamily: 'Fira Code', fontWeight: 700, marginBottom: 4 },
     headerTitle: { fontSize: 13, marginBottom: 10 },
     headerRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 4 },
     headerLink: { color: C.white, fontSize: 9, textDecoration: 'none' },
@@ -32,7 +38,8 @@ const styles = StyleSheet.create({
     section: { marginBottom: 16 },
     sectionHeader: {
         fontSize: 11,
-        fontFamily: 'Courier-Bold',
+        fontFamily: 'Fira Code',
+        fontWeight: 700,
         color: C.purple,
         borderBottomWidth: 1.5,
         borderBottomColor: C.purple,
@@ -40,14 +47,14 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     expBlock: { marginBottom: 10 },
-    expTitle: { fontSize: 11, fontFamily: 'Courier-Bold' },
+    expTitle: { fontSize: 11, fontFamily: 'Fira Code', fontWeight: 700 },
     expPurple: { color: C.purple },
     expMeta: { fontSize: 9, color: C.gray600, marginBottom: 3 },
     bulletRow: { flexDirection: 'row', marginBottom: 2 },
     bulletDot: { width: 10, fontSize: 9, color: C.gray700 },
     bulletText: { flex: 1, fontSize: 9, color: C.gray700, lineHeight: 1.4 },
     eduBlock: { marginBottom: 8 },
-    eduField: { fontSize: 10, fontFamily: 'Courier-Bold', color: C.purple },
+    eduField: { fontSize: 10, fontFamily: 'Fira Code', fontWeight: 700, color: C.purple },
     eduMeta: { fontSize: 9, color: C.gray700 },
     skillsWrap: { flexDirection: 'row', flexWrap: 'wrap' },
     skillTag: {
@@ -63,7 +70,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-    langName: { fontFamily: 'Courier-Bold', fontSize: 9 },
+    langName: { fontFamily: 'Fira Code', fontWeight: 700, fontSize: 9 },
     langLevel: { color: C.purple, fontSize: 9 },
     interestsWrap: { flexDirection: 'row', flexWrap: 'wrap' },
     interestTag: {
