@@ -26,15 +26,20 @@ const styles = StyleSheet.create({
         backgroundColor: C.white,
         fontSize: 10,
         color: C.gray800,
+        paddingTop: 20,
     },
-    header: { backgroundColor: C.purple, padding: 24, color: C.white },
+    header: {
+        backgroundColor: C.purple,
+        paddingTop: 4,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
+        color: C.white,
+    },
     headerName: { fontSize: 24, fontFamily: 'Fira Code', fontWeight: 700, marginBottom: 4 },
     headerTitle: { fontSize: 13, marginBottom: 10 },
     headerRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 4 },
     headerLink: { color: C.white, fontSize: 9, textDecoration: 'none' },
-    body: { flexDirection: 'row', padding: 20, gap: 20 },
-    leftCol: { flex: 1 },
-    rightCol: { width: 155 },
+    body: { flexDirection: 'column', padding: 20 },
     section: { marginBottom: 16 },
     sectionHeader: {
         fontSize: 11,
@@ -179,100 +184,94 @@ export function DeveloperPDF({ data }: DeveloperPDFProps) {
 
                 {/* Body */}
                 <View style={styles.body}>
-                    {/* Left column */}
-                    <View style={styles.leftCol}>
-                        {experiences.length > 0 && (
-                            <View style={styles.section}>
-                                <Text style={styles.sectionHeader}>{'// WORK EXPERIENCE'}</Text>
-                                {experiences.map((exp, i) => (
-                                    <View key={i} style={styles.expBlock}>
-                                        <Text style={styles.expTitle}>
-                                            {exp.company}
-                                            <Text style={styles.expPurple}>
-                                                {' | '}
-                                                {exp.position}
-                                            </Text>
+                    {experiences.length > 0 && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionHeader}>{'// WORK EXPERIENCE'}</Text>
+                            {experiences.map((exp, i) => (
+                                <View key={i} style={styles.expBlock} wrap={false}>
+                                    <Text style={styles.expTitle}>
+                                        {exp.company}
+                                        <Text style={styles.expPurple}>
+                                            {' | '}
+                                            {exp.position}
                                         </Text>
-                                        <Text style={styles.expMeta}>
-                                            {formatPDFDate(exp.startDate)} -{' '}
-                                            {exp.current ? 'Present' : formatPDFDate(exp.endDate)}
-                                            {exp.location ? ` | ${exp.location}` : ''}
-                                        </Text>
-                                        {parseDescriptionLines(exp.description).map((line, j) => (
-                                            <View key={j} style={styles.bulletRow}>
-                                                <Text style={styles.bulletDot}>{'• '}</Text>
-                                                <Text style={styles.bulletText}>{line}</Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ))}
-                            </View>
-                        )}
-
-                        {education.length > 0 && (
-                            <View style={styles.section}>
-                                <Text style={styles.sectionHeader}>{'// EDUCATION'}</Text>
-                                {education.map((edu, i) => (
-                                    <View key={i} style={styles.eduBlock}>
-                                        <Text style={styles.eduField}>{edu.field}</Text>
-                                        <Text style={styles.eduMeta}>
-                                            {edu.degree}
-                                            {edu.degree && edu.institution ? ' — ' : ''}
-                                            {edu.institution}
-                                        </Text>
-                                        <Text style={styles.eduMeta}>
-                                            {formatPDFYear(edu.startDate)} -{' '}
-                                            {formatPDFYear(edu.endDate)}
-                                        </Text>
-                                        {edu.description ? (
-                                            <Text style={styles.bulletText}>{edu.description}</Text>
-                                        ) : null}
-                                    </View>
-                                ))}
-                            </View>
-                        )}
-                    </View>
-
-                    {/* Right column */}
-                    <View style={styles.rightCol}>
-                        {skills.length > 0 && (
-                            <View style={styles.section}>
-                                <Text style={styles.sectionHeader}>{'// TECH STACK'}</Text>
-                                <View style={styles.skillsWrap}>
-                                    {skills.map((s, i) => (
-                                        <Text key={i} style={styles.skillTag}>
-                                            {s.name}
-                                        </Text>
+                                    </Text>
+                                    <Text style={styles.expMeta}>
+                                        {formatPDFDate(exp.startDate)} -{' '}
+                                        {exp.current ? 'Present' : formatPDFDate(exp.endDate)}
+                                        {exp.location ? ` | ${exp.location}` : ''}
+                                    </Text>
+                                    {parseDescriptionLines(exp.description).map((line, j) => (
+                                        <View key={j} style={styles.bulletRow}>
+                                            <Text style={styles.bulletDot}>{'• '}</Text>
+                                            <Text style={styles.bulletText}>{line}</Text>
+                                        </View>
                                     ))}
                                 </View>
-                            </View>
-                        )}
+                            ))}
+                        </View>
+                    )}
 
-                        {languages.length > 0 && (
-                            <View style={styles.section}>
-                                <Text style={styles.sectionHeader}>{'// LANGUAGES'}</Text>
-                                {languages.map((l, i) => (
-                                    <View key={i} style={styles.langRow}>
-                                        <Text style={styles.langName}>{l.language}</Text>
-                                        <Text style={styles.langLevel}>{l.proficiency}</Text>
-                                    </View>
+                    {education.length > 0 && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionHeader}>{'// EDUCATION'}</Text>
+                            {education.map((edu, i) => (
+                                <View key={i} style={styles.eduBlock} wrap={false}>
+                                    <Text style={styles.eduField}>{edu.field}</Text>
+                                    <Text style={styles.eduMeta}>
+                                        {edu.degree}
+                                        {edu.degree && edu.institution ? ' — ' : ''}
+                                        {edu.institution}
+                                    </Text>
+                                    <Text style={styles.eduMeta}>
+                                        {formatPDFYear(edu.startDate)} -{' '}
+                                        {formatPDFYear(edu.endDate)}
+                                    </Text>
+                                    {edu.description ? (
+                                        <Text style={styles.bulletText}>{edu.description}</Text>
+                                    ) : null}
+                                </View>
+                            ))}
+                        </View>
+                    )}
+
+                    {skills.length > 0 && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionHeader}>{'// TECH STACK'}</Text>
+                            <View style={styles.skillsWrap}>
+                                {skills.map((s, i) => (
+                                    <Text key={i} style={styles.skillTag}>
+                                        {s.name}
+                                    </Text>
                                 ))}
                             </View>
-                        )}
+                        </View>
+                    )}
 
-                        {interests.length > 0 && (
-                            <View style={styles.section}>
-                                <Text style={styles.sectionHeader}>{'// INTERESTS'}</Text>
-                                <View style={styles.interestsWrap}>
-                                    {interests.map((interest, i) => (
-                                        <Text key={i} style={styles.interestTag}>
-                                            {interest.name}
-                                        </Text>
-                                    ))}
+                    {languages.length > 0 && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionHeader}>{'// LANGUAGES'}</Text>
+                            {languages.map((l, i) => (
+                                <View key={i} style={styles.langRow}>
+                                    <Text style={styles.langName}>{l.language}</Text>
+                                    <Text style={styles.langLevel}>{l.proficiency}</Text>
                                 </View>
+                            ))}
+                        </View>
+                    )}
+
+                    {interests.length > 0 && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionHeader}>{'// INTERESTS'}</Text>
+                            <View style={styles.interestsWrap}>
+                                {interests.map((interest, i) => (
+                                    <Text key={i} style={styles.interestTag}>
+                                        {interest.name}
+                                    </Text>
+                                ))}
                             </View>
-                        )}
-                    </View>
+                        </View>
+                    )}
                 </View>
 
                 {gdprConsent?.enabled ? <Text style={styles.gdpr}>{gdprText}</Text> : null}

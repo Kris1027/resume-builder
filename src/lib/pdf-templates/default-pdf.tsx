@@ -23,11 +23,17 @@ const C = {
 } as const;
 
 const styles = StyleSheet.create({
-    page: { fontFamily: 'Montserrat', backgroundColor: C.white, fontSize: 10, color: C.gray800 },
+    page: {
+        fontFamily: 'Montserrat',
+        backgroundColor: C.white,
+        fontSize: 10,
+        color: C.gray800,
+        paddingTop: 20,
+    },
     headerBlock: {
         backgroundColor: C.gray50,
         paddingHorizontal: 32,
-        paddingTop: 24,
+        paddingTop: 4,
         paddingBottom: 16,
         borderBottomWidth: 1,
         borderBottomColor: C.gray200,
@@ -73,8 +79,6 @@ const styles = StyleSheet.create({
     eduDegree: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 10 },
     eduYears: { fontSize: 9, color: C.gray500 },
     eduInstitution: { fontSize: 9, color: C.gray700 },
-    twoCol: { flexDirection: 'row', gap: 24 },
-    col: { flex: 1 },
     skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
     skillTag: {
         borderWidth: 1,
@@ -193,7 +197,7 @@ export function DefaultPDF({ data }: DefaultPDFProps) {
                         <View style={styles.section}>
                             <Text style={styles.sectionHeader}>PROFESSIONAL EXPERIENCE</Text>
                             {experiences.map((exp, i) => (
-                                <View key={i} style={styles.expBlock}>
+                                <View key={i} style={styles.expBlock} wrap={false}>
                                     <View style={styles.expTopRow}>
                                         <Text style={styles.expPosition}>{exp.position}</Text>
                                         <Text style={styles.expDate}>
@@ -221,10 +225,10 @@ export function DefaultPDF({ data }: DefaultPDFProps) {
                     )}
 
                     {education.length > 0 && (
-                        <View style={styles.section}>
+                        <View style={styles.section} wrap={false}>
                             <Text style={styles.sectionHeader}>EDUCATION</Text>
                             {education.map((edu, i) => (
-                                <View key={i} style={styles.eduBlock}>
+                                <View key={i} style={styles.eduBlock} wrap={false}>
                                     <View style={styles.eduTopRow}>
                                         <Text style={styles.eduDegree}>
                                             {edu.degree}
@@ -245,36 +249,33 @@ export function DefaultPDF({ data }: DefaultPDFProps) {
                         </View>
                     )}
 
-                    {(skills.length > 0 || languages.length > 0) && (
-                        <View style={[styles.section, styles.twoCol]}>
-                            {skills.length > 0 && (
-                                <View style={styles.col}>
-                                    <Text style={styles.sectionHeader}>CORE COMPETENCIES</Text>
-                                    <View style={styles.skillsWrap}>
-                                        {skills.map((s, i) => (
-                                            <Text key={i} style={styles.skillTag}>
-                                                {s.name}
-                                            </Text>
-                                        ))}
-                                    </View>
+                    {skills.length > 0 && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionHeader}>CORE COMPETENCIES</Text>
+                            <View style={styles.skillsWrap}>
+                                {skills.map((s, i) => (
+                                    <Text key={i} style={styles.skillTag}>
+                                        {s.name}
+                                    </Text>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
+                    {languages.length > 0 && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionHeader}>LANGUAGES</Text>
+                            {languages.map((l, i) => (
+                                <View key={i} style={styles.langRow}>
+                                    <Text style={styles.langName}>{l.language}</Text>
+                                    <Text style={styles.langLevel}>{l.proficiency}</Text>
                                 </View>
-                            )}
-                            {languages.length > 0 && (
-                                <View style={styles.col}>
-                                    <Text style={styles.sectionHeader}>LANGUAGES</Text>
-                                    {languages.map((l, i) => (
-                                        <View key={i} style={styles.langRow}>
-                                            <Text style={styles.langName}>{l.language}</Text>
-                                            <Text style={styles.langLevel}>{l.proficiency}</Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            )}
+                            ))}
                         </View>
                     )}
 
                     {interests.length > 0 && (
-                        <View style={styles.section}>
+                        <View style={styles.section} wrap={false}>
                             <Text style={styles.sectionHeader}>INTERESTS</Text>
                             <View style={styles.interestsWrap}>
                                 {interests.map((interest, i) => (
