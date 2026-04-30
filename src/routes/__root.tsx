@@ -2,6 +2,30 @@ import { createRootRoute } from '@tanstack/react-router';
 import { RootLayout } from '@/components/root-layout';
 import { SITE_URL, SEO_DEFAULTS, OG_DEFAULTS } from '@/lib/seo';
 
+const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: SEO_DEFAULTS.siteName,
+    url: SITE_URL,
+    description: SEO_DEFAULTS.description,
+    applicationCategory: 'BusinessApplication',
+    offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+    },
+    featureList: [
+        'Multiple CV templates',
+        'PDF export',
+        'PDF import',
+        'Dark mode',
+        'Multilingual support (English, Polish)',
+        'GDPR consent clause',
+        'Auto-save',
+    ],
+    inLanguage: ['en', 'pl'],
+};
+
 export const Route = createRootRoute({
     head: () => ({
         meta: [
@@ -29,30 +53,11 @@ export const Route = createRootRoute({
             },
             { name: 'twitter:description', content: SEO_DEFAULTS.description },
             { name: 'twitter:image', content: OG_DEFAULTS.image },
+        ],
+        headScripts: [
             {
-                'script:ld+json': {
-                    '@context': 'https://schema.org',
-                    '@type': 'WebApplication',
-                    name: SEO_DEFAULTS.siteName,
-                    url: SITE_URL,
-                    description: SEO_DEFAULTS.description,
-                    applicationCategory: 'BusinessApplication',
-                    offers: {
-                        '@type': 'Offer',
-                        price: '0',
-                        priceCurrency: 'USD',
-                    },
-                    featureList: [
-                        'Multiple CV templates',
-                        'PDF export',
-                        'PDF import',
-                        'Dark mode',
-                        'Multilingual support (English, Polish)',
-                        'GDPR consent clause',
-                        'Auto-save',
-                    ],
-                    inLanguage: ['en', 'pl'],
-                },
+                type: 'application/ld+json',
+                children: JSON.stringify(structuredData),
             },
         ],
         links: [
