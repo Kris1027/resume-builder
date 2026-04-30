@@ -2,12 +2,13 @@ import '@/lib/pdf-fonts';
 import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/types/form-types';
 import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 import { formatLinkedinDisplay } from '@/lib/utils';
+import { getPDFStrings, getDateFnsLocale, type PDFLang } from '@/lib/pdf-translations';
 
 interface DefaultPDFProps {
     data: ResumeData;
     compactScale?: number; // 0 = normal, 1 = maximum compact
+    lang?: PDFLang;
 }
 
 const C = {
@@ -140,11 +141,14 @@ function createStyles(t: number) {
     });
 }
 
-function formatPDFDateShort(dateString: string): string {
+function formatPDFDateShort(
+    dateString: string,
+    locale: ReturnType<typeof getDateFnsLocale>,
+): string {
     if (!dateString) return '';
     const [year, month] = dateString.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    return format(date, 'LLL yyyy', { locale: enUS });
+    return format(date, 'LLL yyyy', { locale });
 }
 
 function formatPDFYear(dateString: string): string {
@@ -160,8 +164,10 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
+export function DefaultPDF({ data, compactScale = 0, lang = 'en' }: DefaultPDFProps) {
     const styles = createStyles(compactScale);
+    const str = getPDFStrings(lang);
+    const dateLocale = getDateFnsLocale(lang);
     const {
         personalInfo: p,
         experiences,
@@ -173,8 +179,8 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
     } = data;
 
     const gdprText = gdprConsent?.companyName?.trim()
-        ? `I hereby give my consent for my personal data included in my CV to be processed for the purposes of the recruitment process conducted by ${gdprConsent.companyName} in accordance with Regulation (EU) 2016/679 (GDPR).`
-        : 'I hereby give my consent for my personal data included in my CV to be processed for the purposes of the recruitment process in accordance with Regulation (EU) 2016/679 (GDPR).';
+        ? str.gdprConsent(gdprConsent.companyName)
+        : str.gdprConsentGeneric;
 
     return (
         <Document
@@ -182,7 +188,7 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
             author={`${p.firstName} ${p.lastName}`}
             subject='Professional Resume'
             keywords={skills.map((s) => s.name).join(', ')}
-            language='en'
+            language={lang}
         >
             <Page size='A4' style={styles.page}>
                 <View style={styles.headerBlock}>
@@ -220,16 +226,18 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
                 <View style={styles.body}>
                     {experiences.length > 0 && (
                         <View style={styles.section}>
-                            <Text style={styles.sectionHeader}>PROFESSIONAL EXPERIENCE</Text>
+                            <Text style={styles.sectionHeader}>
+                                {str.professionalExperience.toUpperCase()}
+                            </Text>
                             {experiences.map((exp, i) => (
                                 <View key={i} style={styles.expBlock} wrap={false}>
                                     <View style={styles.expTopRow}>
                                         <Text style={styles.expPosition}>{exp.position}</Text>
                                         <Text style={styles.expDate}>
-                                            {formatPDFDateShort(exp.startDate)} -{' '}
+                                            {formatPDFDateShort(exp.startDate, dateLocale)} -{' '}
                                             {exp.current
-                                                ? 'Present'
-                                                : formatPDFDateShort(exp.endDate)}
+                                                ? str.present
+                                                : formatPDFDateShort(exp.endDate, dateLocale)}
                                         </Text>
                                     </View>
                                     <View style={styles.expCompanyRow}>
@@ -251,7 +259,7 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
 
                     {education.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>EDUCATION</Text>
+                            <Text style={styles.sectionHeader}>{str.education.toUpperCase()}</Text>
                             {education.map((edu, i) => (
                                 <View key={i} style={styles.eduBlock} wrap={false}>
                                     <View style={styles.eduTopRow}>
@@ -276,7 +284,9 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
 
                     {skills.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>CORE COMPETENCIES</Text>
+                            <Text style={styles.sectionHeader}>
+                                {str.coreCompetencies.toUpperCase()}
+                            </Text>
                             <View style={styles.skillsWrap}>
                                 {skills.map((s, i) => (
                                     <Text key={i} style={styles.skillTag}>
@@ -289,7 +299,7 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
 
                     {languages.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>LANGUAGES</Text>
+                            <Text style={styles.sectionHeader}>{str.languages.toUpperCase()}</Text>
                             {languages.map((l, i) => (
                                 <View key={i} style={styles.langRow}>
                                     <Text style={styles.langName}>{l.language}</Text>
@@ -301,7 +311,7 @@ export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
 
                     {interests.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>INTERESTS</Text>
+                            <Text style={styles.sectionHeader}>{str.interests.toUpperCase()}</Text>
                             <View style={styles.interestsWrap}>
                                 {interests.map((interest, i) => (
                                     <Text key={i} style={styles.interestTag}>

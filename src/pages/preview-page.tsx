@@ -6,8 +6,10 @@ import { ArrowLeft, Download, Edit, Loader2, FileWarning, FileText, Files } from
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import { exportToPDF, countPdfPages, generateResumeFilename } from '@/lib/pdf-export';
+import { TEMPLATE_IDS } from '@/lib/template-ids';
 import type { TemplateId } from '@/lib/template-ids';
 import { useTranslation } from 'react-i18next';
+import { normalizePDFLang } from '@/lib/pdf-translations';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,12 +25,17 @@ import { DeveloperPDF } from '@/lib/pdf-templates/developer-pdf';
 import { DefaultPDF } from '@/lib/pdf-templates/default-pdf';
 import { VeterinaryPDF } from '@/lib/pdf-templates/veterinary-pdf';
 
-function getPdfDocument(resumeData: ResumeData, templateId: string, compactScale: number) {
+function getPdfDocument(
+    resumeData: ResumeData,
+    templateId: TemplateId,
+    compactScale: number,
+    lang: ReturnType<typeof normalizePDFLang>,
+) {
     if (templateId === 'developer')
-        return <DeveloperPDF data={resumeData} compactScale={compactScale} />;
+        return <DeveloperPDF data={resumeData} compactScale={compactScale} lang={lang} />;
     if (templateId === 'default')
-        return <DefaultPDF data={resumeData} compactScale={compactScale} />;
-    return <VeterinaryPDF data={resumeData} compactScale={compactScale} />;
+        return <DefaultPDF data={resumeData} compactScale={compactScale} lang={lang} />;
+    return <VeterinaryPDF data={resumeData} compactScale={compactScale} lang={lang} />;
 }
 
 // Binary search: find the minimum compactScale (0–1) that makes the PDF fit on one page.
@@ -56,9 +63,13 @@ async function findMinCompactScale(
 }
 
 export const PreviewPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const search = useSearch({ from: '/preview' }) as { templateId?: string };
-    const templateId = search.templateId || 'developer';
+    const rawTemplateId = search.templateId;
+    const templateId: TemplateId = TEMPLATE_IDS.includes(rawTemplateId as TemplateId)
+        ? (rawTemplateId as TemplateId)
+        : 'developer';
+    const lang = normalizePDFLang(i18n.language);
 
     const [resumeData, setResumeData] = useState<ResumeData | null>(null);
     const [isExporting, setIsExporting] = useState(false);
@@ -105,7 +116,7 @@ export const PreviewPage = () => {
         async function run() {
             const { pdf } = await import('@react-pdf/renderer');
 
-            const normalBlob = await pdf(getPdfDocument(resumeData!, templateId, 0)).toBlob();
+            const normalBlob = await pdf(getPdfDocument(resumeData!, templateId, 0, lang)).toBlob();
             if (cancelled) return;
 
             const pages = await countPdfPages(normalBlob);
@@ -114,7 +125,7 @@ export const PreviewPage = () => {
             setIsMultiPage(true);
 
             const scale = await findMinCompactScale((s) =>
-                pdf(getPdfDocument(resumeData!, templateId, s)).toBlob(),
+                pdf(getPdfDocument(resumeData!, templateId, s, lang)).toBlob(),
             );
             if (!cancelled) setOptimalScale(scale === null ? 'cannot-fit' : scale);
         }
@@ -126,7 +137,7 @@ export const PreviewPage = () => {
         return () => {
             cancelled = true;
         };
-    }, [resumeData, templateId]);
+    }, [resumeData, templateId, lang]);
 
     const handleDownloadPDF = async () => {
         if (!resumeData) return;
@@ -137,7 +148,11 @@ export const PreviewPage = () => {
                 resumeData.personalInfo?.lastName,
             );
             const compactScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
-            await exportToPDF(resumeData, templateId as TemplateId, { filename, compactScale });
+            await exportToPDF(resumeData, templateId, {
+                filename,
+                compactScale,
+                lang: i18n.language,
+            });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
             setExportError(t('preview.exportError'));
@@ -180,7 +195,7 @@ export const PreviewPage = () => {
     }
 
     const activeScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
-    const pdfDocument = getPdfDocument(resumeData, templateId, activeScale);
+    const pdfDocument = getPdfDocument(resumeData, templateId, activeScale, lang);
     const isSearching = isMultiPage && optimalScale === null;
     // Hide toggle entirely when content can't fit even at max compaction
     const showToggle = isMultiPage && optimalScale !== 'cannot-fit';

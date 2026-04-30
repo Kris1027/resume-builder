@@ -2,12 +2,13 @@ import '@/lib/pdf-fonts';
 import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/types/form-types';
 import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 import { formatWebsiteDisplay, formatGithubDisplay, formatLinkedinDisplay } from '@/lib/utils';
+import { getPDFStrings, getDateFnsLocale, type PDFLang } from '@/lib/pdf-translations';
 
 interface DeveloperPDFProps {
     data: ResumeData;
     compactScale?: number; // 0 = normal, 1 = maximum compact
+    lang?: PDFLang;
 }
 
 const C = {
@@ -113,11 +114,11 @@ function createStyles(t: number) {
     });
 }
 
-function formatPDFDate(dateString: string): string {
+function formatPDFDate(dateString: string, locale: ReturnType<typeof getDateFnsLocale>): string {
     if (!dateString) return '';
     const [year, month] = dateString.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    return format(date, 'LLLL yyyy', { locale: enUS });
+    return format(date, 'LLLL yyyy', { locale });
 }
 
 function formatPDFYear(dateString: string): string {
@@ -133,8 +134,10 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
+export function DeveloperPDF({ data, compactScale = 0, lang = 'en' }: DeveloperPDFProps) {
     const styles = createStyles(compactScale);
+    const str = getPDFStrings(lang);
+    const dateLocale = getDateFnsLocale(lang);
     const {
         personalInfo: p,
         experiences,
@@ -146,8 +149,8 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
     } = data;
 
     const gdprText = gdprConsent?.companyName?.trim()
-        ? `I hereby give my consent for my personal data included in my CV to be processed for the purposes of the recruitment process conducted by ${gdprConsent.companyName} in accordance with Regulation (EU) 2016/679 (GDPR).`
-        : 'I hereby give my consent for my personal data included in my CV to be processed for the purposes of the recruitment process in accordance with Regulation (EU) 2016/679 (GDPR).';
+        ? str.gdprConsent(gdprConsent.companyName)
+        : str.gdprConsentGeneric;
 
     return (
         <Document
@@ -155,7 +158,7 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
             author={`${p.firstName} ${p.lastName}`}
             subject='Professional Resume'
             keywords={skills.map((s) => s.name).join(', ')}
-            language='en'
+            language={lang}
         >
             <Page size='A4' style={styles.page}>
                 <View style={styles.header}>
@@ -198,7 +201,9 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
                 <View style={styles.body}>
                     {experiences.length > 0 && (
                         <View style={styles.section}>
-                            <Text style={styles.sectionHeader}>{'// WORK EXPERIENCE'}</Text>
+                            <Text
+                                style={styles.sectionHeader}
+                            >{`// ${str.workExperience.toUpperCase()}`}</Text>
                             {experiences.map((exp, i) => (
                                 <View key={i} style={styles.expBlock} wrap={false}>
                                     <Text style={styles.expTitle}>
@@ -209,8 +214,10 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
                                         </Text>
                                     </Text>
                                     <Text style={styles.expMeta}>
-                                        {formatPDFDate(exp.startDate)} -{' '}
-                                        {exp.current ? 'Present' : formatPDFDate(exp.endDate)}
+                                        {formatPDFDate(exp.startDate, dateLocale)} -{' '}
+                                        {exp.current
+                                            ? str.present
+                                            : formatPDFDate(exp.endDate, dateLocale)}
                                         {exp.location ? ` | ${exp.location}` : ''}
                                     </Text>
                                     {parseDescriptionLines(exp.description).map((line, j) => (
@@ -226,7 +233,9 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
 
                     {education.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{'// EDUCATION'}</Text>
+                            <Text
+                                style={styles.sectionHeader}
+                            >{`// ${str.education.toUpperCase()}`}</Text>
                             {education.map((edu, i) => (
                                 <View key={i} style={styles.eduBlock} wrap={false}>
                                     <Text style={styles.eduField}>{edu.field}</Text>
@@ -249,7 +258,9 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
 
                     {skills.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{'// TECH STACK'}</Text>
+                            <Text
+                                style={styles.sectionHeader}
+                            >{`// ${str.techStack.toUpperCase()}`}</Text>
                             <View style={styles.skillsWrap}>
                                 {skills.map((s, i) => (
                                     <Text key={i} style={styles.skillTag}>
@@ -262,7 +273,9 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
 
                     {languages.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{'// LANGUAGES'}</Text>
+                            <Text
+                                style={styles.sectionHeader}
+                            >{`// ${str.languages.toUpperCase()}`}</Text>
                             {languages.map((l, i) => (
                                 <View key={i} style={styles.langRow}>
                                     <Text style={styles.langName}>{l.language}</Text>
@@ -274,7 +287,9 @@ export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
 
                     {interests.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{'// INTERESTS'}</Text>
+                            <Text
+                                style={styles.sectionHeader}
+                            >{`// ${str.interests.toUpperCase()}`}</Text>
                             <View style={styles.interestsWrap}>
                                 {interests.map((interest, i) => (
                                     <Text key={i} style={styles.interestTag}>

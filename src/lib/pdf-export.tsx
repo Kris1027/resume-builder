@@ -1,9 +1,11 @@
 import type { ResumeData } from '@/types/form-types';
 import type { TemplateId } from '@/lib/template-ids';
+import { normalizePDFLang } from '@/lib/pdf-translations';
 
 export interface PDFExportOptions {
     filename?: string;
     compactScale?: number;
+    lang?: string;
 }
 
 export async function exportToPDF(
@@ -11,7 +13,8 @@ export async function exportToPDF(
     templateId: TemplateId,
     options: PDFExportOptions = {},
 ): Promise<void> {
-    const { filename = 'resume.pdf', compactScale = 0 } = options;
+    const { filename = 'resume.pdf', compactScale = 0, lang: rawLang = 'en' } = options;
+    const lang = normalizePDFLang(rawLang);
 
     const [{ pdf }, { DeveloperPDF }, { DefaultPDF }, { VeterinaryPDF }] = await Promise.all([
         import('@react-pdf/renderer'),
@@ -22,11 +25,11 @@ export async function exportToPDF(
 
     const element =
         templateId === 'developer' ? (
-            <DeveloperPDF data={resumeData} compactScale={compactScale} />
+            <DeveloperPDF data={resumeData} compactScale={compactScale} lang={lang} />
         ) : templateId === 'default' ? (
-            <DefaultPDF data={resumeData} compactScale={compactScale} />
+            <DefaultPDF data={resumeData} compactScale={compactScale} lang={lang} />
         ) : (
-            <VeterinaryPDF data={resumeData} compactScale={compactScale} />
+            <VeterinaryPDF data={resumeData} compactScale={compactScale} lang={lang} />
         );
 
     const blob = await pdf(element).toBlob();

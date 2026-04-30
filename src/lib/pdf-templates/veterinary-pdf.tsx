@@ -2,12 +2,13 @@ import '@/lib/pdf-fonts';
 import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/types/form-types';
 import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 import { formatLinkedinDisplay } from '@/lib/utils';
+import { getPDFStrings, getDateFnsLocale, type PDFLang } from '@/lib/pdf-translations';
 
 interface VeterinaryPDFProps {
     data: ResumeData;
     compactScale?: number; // 0 = normal, 1 = maximum compact
+    lang?: PDFLang;
 }
 
 const C = {
@@ -159,11 +160,14 @@ function createStyles(t: number) {
     });
 }
 
-function formatPDFDateShort(dateString: string): string {
+function formatPDFDateShort(
+    dateString: string,
+    locale: ReturnType<typeof getDateFnsLocale>,
+): string {
     if (!dateString) return '';
     const [year, month] = dateString.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    return format(date, 'LLL yyyy', { locale: enUS });
+    return format(date, 'LLL yyyy', { locale });
 }
 
 function formatPDFYear(dateString: string): string {
@@ -179,8 +183,10 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
+export function VeterinaryPDF({ data, compactScale = 0, lang = 'en' }: VeterinaryPDFProps) {
     const styles = createStyles(compactScale);
+    const str = getPDFStrings(lang);
+    const dateLocale = getDateFnsLocale(lang);
     const {
         personalInfo: p,
         experiences,
@@ -192,8 +198,8 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
     } = data;
 
     const gdprText = gdprConsent?.companyName?.trim()
-        ? `I hereby give my consent for my personal data included in my CV to be processed for the purposes of the recruitment process conducted by ${gdprConsent.companyName} in accordance with Regulation (EU) 2016/679 (GDPR).`
-        : 'I hereby give my consent for my personal data included in my CV to be processed for the purposes of the recruitment process in accordance with Regulation (EU) 2016/679 (GDPR).';
+        ? str.gdprConsent(gdprConsent.companyName)
+        : str.gdprConsentGeneric;
 
     return (
         <Document
@@ -201,7 +207,7 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
             author={`${p.firstName} ${p.lastName}`}
             subject='Professional Resume'
             keywords={skills.map((s) => s.name).join(', ')}
-            language='en'
+            language={lang}
         >
             <Page size='A4' style={styles.page}>
                 <View style={styles.header}>
@@ -237,14 +243,16 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
                 <View style={styles.body}>
                     {experiences.length > 0 && (
                         <View style={styles.section}>
-                            <Text style={styles.sectionHeader}>Work Experience</Text>
+                            <Text style={styles.sectionHeader}>{str.workExperience}</Text>
                             {experiences.map((exp, i) => (
                                 <View key={i} style={styles.expBlock} wrap={false}>
                                     <Text style={styles.expPosition}>{exp.position}</Text>
                                     <Text style={styles.expCompany}>{exp.company}</Text>
                                     <Text style={styles.expMeta}>
-                                        {formatPDFDateShort(exp.startDate)} -{' '}
-                                        {exp.current ? 'Present' : formatPDFDateShort(exp.endDate)}
+                                        {formatPDFDateShort(exp.startDate, dateLocale)} -{' '}
+                                        {exp.current
+                                            ? str.present
+                                            : formatPDFDateShort(exp.endDate, dateLocale)}
                                         {exp.location ? ` | ${exp.location}` : ''}
                                     </Text>
                                     {parseDescriptionLines(exp.description).map((line, j) => (
@@ -260,7 +268,7 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
 
                     {education.length > 0 && (
                         <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>Education</Text>
+                            <Text style={styles.sectionHeader}>{str.education}</Text>
                             {education.map((edu, i) => (
                                 <View key={i} style={styles.eduBlock} wrap={false}>
                                     <Text style={styles.eduDegree}>
@@ -283,7 +291,7 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
 
                     {skills.length > 0 && (
                         <View style={[styles.card, styles.cardEmerald]} wrap={false}>
-                            <Text style={styles.cardHeader}>Skills</Text>
+                            <Text style={styles.cardHeader}>{str.skills}</Text>
                             <View style={styles.skillsWrap}>
                                 {skills.map((s, i) => (
                                     <Text key={i} style={styles.skillTag}>
@@ -297,7 +305,7 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
                     {languages.length > 0 && (
                         <View style={[styles.card, styles.cardTeal]} wrap={false}>
                             <Text style={[styles.cardHeader, styles.cardHeaderTeal]}>
-                                Languages
+                                {str.languages}
                             </Text>
                             {languages.map((l, i) => (
                                 <View key={i} style={styles.langRow}>
@@ -311,7 +319,7 @@ export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
                     {interests.length > 0 && (
                         <View style={[styles.card, styles.cardDeep]} wrap={false}>
                             <Text style={[styles.cardHeader, styles.cardHeaderDeep]}>
-                                SPECIAL INTERESTS
+                                {str.specialInterests.toUpperCase()}
                             </Text>
                             <View style={styles.interestsWrap}>
                                 {interests.map((interest, i) => (
