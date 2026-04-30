@@ -13,6 +13,7 @@ const contentSecurityPolicy = [
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "connect-src 'self' data: blob:",
+    "frame-src 'self' blob:",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
