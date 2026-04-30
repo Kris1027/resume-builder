@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState, type ReactElement } from 'react';
 import { Link, useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import type { ResumeData } from '@/types/form-types';
@@ -20,7 +20,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { safeStorage } from '@/lib/storage';
-import { PDFViewer } from '@react-pdf/renderer';
+import { PDFViewer, type DocumentProps } from '@react-pdf/renderer';
 import { DeveloperPDF } from '@/lib/pdf-templates/developer-pdf';
 import { DefaultPDF } from '@/lib/pdf-templates/default-pdf';
 import { VeterinaryPDF } from '@/lib/pdf-templates/veterinary-pdf';
@@ -37,6 +37,18 @@ function getPdfDocument(
         return <DefaultPDF data={resumeData} compactScale={compactScale} lang={lang} />;
     return <VeterinaryPDF data={resumeData} compactScale={compactScale} lang={lang} />;
 }
+
+const PdfPreview = memo(function PdfPreview({
+    document,
+}: {
+    document: ReactElement<DocumentProps>;
+}) {
+    return (
+        <PDFViewer width='100%' height='100%' showToolbar={false}>
+            {document}
+        </PDFViewer>
+    );
+});
 
 // Binary search: find the minimum compactScale (0–1) that makes the PDF fit on one page.
 // Returns null when content can't fit even at maximum compaction.
@@ -78,6 +90,7 @@ export const PreviewPage = () => {
     // null = searching, number = found scale, 'cannot-fit' = even max compaction overflows
     const [optimalScale, setOptimalScale] = useState<number | 'cannot-fit' | null>(null);
     const [useCompact, setUseCompact] = useState(false);
+    const [isPreviewReady, setIsPreviewReady] = useState(false);
 
     useEffect(() => {
         const storedData = safeStorage.getItem('resumeData');
@@ -107,6 +120,7 @@ export const PreviewPage = () => {
         if (!resumeData) return;
 
         // Reset all compact-related state so stale values don't linger if templateId changes
+        setIsPreviewReady(false);
         setIsMultiPage(false);
         setOptimalScale(null);
         setUseCompact(false);
@@ -120,18 +134,25 @@ export const PreviewPage = () => {
             if (cancelled) return;
 
             const pages = await countPdfPages(normalBlob);
-            if (pages <= 1) return;
+            if (pages <= 1) {
+                setIsPreviewReady(true);
+                return;
+            }
 
             setIsMultiPage(true);
 
             const scale = await findMinCompactScale((s) =>
                 pdf(getPdfDocument(resumeData!, templateId, s, lang)).toBlob(),
             );
-            if (!cancelled) setOptimalScale(scale === null ? 'cannot-fit' : scale);
+            if (!cancelled) {
+                setOptimalScale(scale === null ? 'cannot-fit' : scale);
+                setIsPreviewReady(true);
+            }
         }
 
         run().catch((err) => {
             if (import.meta.env.DEV) console.error('Failed to detect PDF page count:', err);
+            if (!cancelled) setIsPreviewReady(true);
         });
 
         return () => {
@@ -160,6 +181,14 @@ export const PreviewPage = () => {
             setIsExporting(false);
         }
     };
+
+    const activeScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
+    const pdfDocument = useMemo(
+        () => (resumeData ? getPdfDocument(resumeData, templateId, activeScale, lang) : null),
+        [resumeData, templateId, activeScale, lang],
+    );
+    // Hide toggle entirely when content can't fit even at max compaction
+    const showToggle = isPreviewReady && isMultiPage && optimalScale !== 'cannot-fit';
 
     if (!resumeData) {
         return (
@@ -194,12 +223,6 @@ export const PreviewPage = () => {
         );
     }
 
-    const activeScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
-    const pdfDocument = getPdfDocument(resumeData, templateId, activeScale, lang);
-    const isSearching = isMultiPage && optimalScale === null;
-    // Hide toggle entirely when content can't fit even at max compaction
-    const showToggle = isMultiPage && optimalScale !== 'cannot-fit';
-
     return (
         <div className='flex h-screen flex-col overflow-hidden'>
             {/* Navbar */}
@@ -219,42 +242,39 @@ export const PreviewPage = () => {
                         </div>
 
                         <div className='flex items-center gap-3'>
-                            {/* Page layout toggle — visible only when content exceeds one page and can be compacted */}
-                            {showToggle && (
-                                <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
-                                    <button
-                                        type='button'
-                                        aria-pressed={!useCompact}
-                                        onClick={() => setUseCompact(false)}
-                                        className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
-                                            !useCompact
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
-                                        }`}
-                                    >
-                                        <Files className='h-3.5 w-3.5' />
-                                        {t('preview.multiPage')}
-                                    </button>
-                                    <button
-                                        type='button'
-                                        aria-pressed={useCompact}
-                                        onClick={() => setUseCompact(true)}
-                                        disabled={isSearching}
-                                        className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                                            useCompact
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
-                                        }`}
-                                    >
-                                        {isSearching ? (
-                                            <Loader2 className='h-3.5 w-3.5 animate-spin' />
-                                        ) : (
+                            <div className='flex min-h-8 items-center justify-end md:min-w-[190px]'>
+                                {/* Page layout toggle — visible only when content exceeds one page and can be compacted */}
+                                {showToggle && (
+                                    <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
+                                        <button
+                                            type='button'
+                                            aria-pressed={!useCompact}
+                                            onClick={() => setUseCompact(false)}
+                                            className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
+                                                !useCompact
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+                                            }`}
+                                        >
+                                            <Files className='h-3.5 w-3.5' />
+                                            {t('preview.multiPage')}
+                                        </button>
+                                        <button
+                                            type='button'
+                                            aria-pressed={useCompact}
+                                            onClick={() => setUseCompact(true)}
+                                            className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
+                                                useCompact
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+                                            }`}
+                                        >
                                             <FileText className='h-3.5 w-3.5' />
-                                        )}
-                                        {t('preview.singlePage')}
-                                    </button>
-                                </div>
-                            )}
+                                            {t('preview.singlePage')}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             <Button
                                 variant='outline'
@@ -289,9 +309,15 @@ export const PreviewPage = () => {
 
             {/* PDF Preview */}
             <div className='min-h-0 flex-1'>
-                <PDFViewer width='100%' height='100%' showToolbar={false}>
-                    {pdfDocument}
-                </PDFViewer>
+                {isPreviewReady && pdfDocument ? (
+                    <PdfPreview document={pdfDocument} />
+                ) : (
+                    <div className='flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950'>
+                        <p className='text-sm text-gray-500 dark:text-gray-400'>
+                            {t('preview.title')}...
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Export Error Dialog */}
