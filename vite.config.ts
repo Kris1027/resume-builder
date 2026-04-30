@@ -6,27 +6,27 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const contentSecurityPolicy = [
+    "default-src 'self'",
+    "script-src 'self' 'wasm-unsafe-eval'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "connect-src 'self' data: blob:",
+    "worker-src 'self' blob:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+].join('; ');
+
 const htmlCsp = (): Plugin => ({
     name: 'html-csp',
     transformIndexHtml: {
         order: 'post',
         handler(html) {
-            const csp = [
-                "default-src 'self'",
-                "script-src 'self'",
-                "style-src 'self' 'unsafe-inline'",
-                "img-src 'self' data: blob:",
-                "font-src 'self'",
-                "connect-src 'self'",
-                "worker-src 'self' blob:",
-                "object-src 'none'",
-                "base-uri 'self'",
-                "form-action 'self'",
-            ].join('; ');
-
             return html.replace(
                 '<head>',
-                `<head>\n    <meta http-equiv="Content-Security-Policy" content="${csp}">`,
+                `<head>\n    <meta http-equiv="Content-Security-Policy" content="${contentSecurityPolicy}">`,
             );
         },
     },
@@ -78,7 +78,10 @@ export default defineConfig(({ command }) => ({
                 ],
             },
             workbox: {
+                cleanupOutdatedCaches: true,
+                clientsClaim: true,
                 globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+                skipWaiting: true,
             },
         }),
         ...(command === 'build' ? [htmlCsp()] : []),
