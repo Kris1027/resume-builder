@@ -7,7 +7,7 @@ import { formatLinkedinDisplay } from '@/lib/utils';
 
 interface VeterinaryPDFProps {
     data: ResumeData;
-    compact?: boolean;
+    compactScale?: number; // 0 = normal, 1 = maximum compact
 }
 
 const C = {
@@ -27,136 +27,134 @@ const C = {
     gray200: '#E5E7EB',
 } as const;
 
-function createStyles(compact: boolean) {
-    const c = compact;
+const lerp = (normal: number, min: number, t: number) =>
+    Math.round((normal + (min - normal) * t) * 10) / 10;
+
+function createStyles(t: number) {
+    const s = (n: number, m: number) => lerp(n, m, t);
     return StyleSheet.create({
         page: {
             fontFamily: 'Lato',
             backgroundColor: C.white,
             fontSize: 10,
             color: C.gray800,
-            paddingTop: c ? 10 : 20,
+            paddingTop: s(20, 8),
         },
         header: {
             backgroundColor: C.emerald50,
             borderBottomWidth: 2,
             borderBottomColor: C.emerald600,
-            paddingHorizontal: c ? 16 : 24,
+            paddingHorizontal: s(24, 14),
             paddingTop: 0,
-            paddingBottom: c ? 8 : 16,
+            paddingBottom: s(16, 6),
         },
         headerName: {
             fontFamily: 'Merriweather',
             fontWeight: 700,
-            fontSize: c ? 18 : 22,
+            fontSize: s(22, 15),
             color: C.gray800,
             textAlign: 'center',
-            marginBottom: c ? 2 : 4,
+            marginBottom: s(4, 1),
         },
         headerTitle: {
             textAlign: 'center',
-            fontSize: c ? 10 : 12,
+            fontSize: s(12, 9),
             color: C.emerald700,
-            marginBottom: c ? 6 : 10,
+            marginBottom: s(10, 3),
         },
         contactRow: {
             flexDirection: 'row',
             justifyContent: 'center',
             flexWrap: 'wrap',
-            gap: c ? 5 : 8,
+            gap: s(8, 4),
         },
         contactLink: {
-            fontSize: 9,
+            fontSize: s(9, 7),
             color: C.gray600,
             textDecoration: 'none',
             backgroundColor: C.white,
-            paddingHorizontal: c ? 6 : 8,
-            paddingVertical: c ? 2 : 3,
+            paddingHorizontal: s(8, 4),
+            paddingVertical: s(3, 1),
             borderRadius: 10,
         },
-        body: { flexDirection: 'column', padding: c ? 12 : 20 },
-        section: { marginBottom: c ? 8 : 14 },
+        body: { flexDirection: 'column', padding: s(20, 10) },
+        section: { marginBottom: s(14, 5) },
         sectionHeader: {
-            fontSize: c ? 9 : 10,
+            fontSize: s(10, 8),
             fontFamily: 'Merriweather',
             fontWeight: 700,
             color: C.emerald700,
             borderBottomWidth: 1.5,
             borderBottomColor: C.emerald200,
-            paddingBottom: c ? 2 : 3,
-            marginBottom: c ? 5 : 8,
+            paddingBottom: s(3, 1),
+            marginBottom: s(8, 3),
         },
         expBlock: {
-            marginBottom: c ? 6 : 10,
+            marginBottom: s(10, 4),
             borderLeftWidth: 2,
             borderLeftColor: C.emerald200,
-            paddingLeft: c ? 7 : 10,
+            paddingLeft: s(10, 6),
         },
-        expPosition: {
-            fontFamily: 'Lato',
-            fontWeight: 700,
-            fontSize: c ? 9 : 10,
-            color: C.gray800,
-        },
-        expMeta: { fontSize: c ? 8 : 9, color: C.gray600, marginBottom: c ? 2 : 3 },
-        expCompany: { fontSize: c ? 8 : 9, color: C.emerald700 },
-        bulletRow: { flexDirection: 'row', marginBottom: c ? 1 : 2 },
-        bulletDot: { width: 10, fontSize: c ? 8 : 9, color: C.emerald600 },
-        bulletText: { flex: 1, fontSize: c ? 8 : 9, color: C.gray700, lineHeight: c ? 1.3 : 1.4 },
-        eduBlock: { marginBottom: c ? 5 : 8 },
-        eduDegree: { fontFamily: 'Lato', fontWeight: 700, fontSize: c ? 9 : 10, color: C.gray800 },
-        eduInstitution: { fontSize: c ? 8 : 9, color: C.emerald700 },
-        eduYears: { fontSize: c ? 8 : 9, color: C.gray500 },
+        expPosition: { fontFamily: 'Lato', fontWeight: 700, fontSize: s(10, 8), color: C.gray800 },
+        expMeta: { fontSize: s(9, 7), color: C.gray600, marginBottom: s(3, 1) },
+        expCompany: { fontSize: s(9, 7), color: C.emerald700 },
+        bulletRow: { flexDirection: 'row', marginBottom: s(2, 0.5) },
+        bulletDot: { width: 10, fontSize: s(9, 7), color: C.emerald600 },
+        bulletText: { flex: 1, fontSize: s(9, 7), color: C.gray700, lineHeight: s(1.4, 1.2) },
+        eduBlock: { marginBottom: s(8, 3) },
+        eduDegree: { fontFamily: 'Lato', fontWeight: 700, fontSize: s(10, 8), color: C.gray800 },
+        eduInstitution: { fontSize: s(9, 7), color: C.emerald700 },
+        eduYears: { fontSize: s(9, 7), color: C.gray500 },
         card: {
             borderRadius: 6,
-            padding: c ? 7 : 10,
-            marginBottom: c ? 7 : 12,
+            padding: s(10, 5),
+            marginBottom: s(12, 5),
         },
         cardEmerald: { backgroundColor: C.emerald50 },
         cardTeal: { backgroundColor: C.teal50 },
         cardDeep: { backgroundColor: C.emerald100 },
         cardHeader: {
-            fontSize: c ? 8 : 9,
+            fontSize: s(9, 7),
             fontFamily: 'Merriweather',
             fontWeight: 700,
             color: C.emerald700,
             borderBottomWidth: 1,
             borderBottomColor: C.emerald200,
-            paddingBottom: c ? 2 : 3,
-            marginBottom: c ? 4 : 6,
+            paddingBottom: s(3, 1),
+            marginBottom: s(6, 2),
         },
         cardHeaderTeal: { color: C.teal600, borderBottomColor: C.emerald200 },
         cardHeaderDeep: { color: C.emerald800, borderBottomColor: C.emerald200 },
-        skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
+        skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: s(3, 2) },
         skillTag: {
             backgroundColor: C.emerald100,
             color: C.emerald700,
             borderRadius: 3,
-            paddingHorizontal: c ? 4 : 5,
-            paddingVertical: c ? 1 : 2,
-            fontSize: c ? 7 : 8,
+            paddingHorizontal: s(5, 3),
+            paddingVertical: s(2, 1),
+            fontSize: s(8, 6),
         },
-        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: c ? 2 : 3 },
-        langName: { fontFamily: 'Lato', fontWeight: 700, fontSize: c ? 8 : 9 },
-        langLevel: { fontSize: c ? 8 : 9, color: C.teal600 },
-        interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
+        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: s(3, 1) },
+        langName: { fontFamily: 'Lato', fontWeight: 700, fontSize: s(9, 7) },
+        langLevel: { fontSize: s(9, 7), color: C.teal600 },
+        interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: s(3, 2) },
         interestTag: {
             backgroundColor: C.emerald200,
             color: C.emerald800,
             borderRadius: 3,
-            paddingHorizontal: c ? 4 : 5,
-            paddingVertical: c ? 1 : 2,
-            fontSize: c ? 7 : 8,
+            paddingHorizontal: s(5, 3),
+            paddingVertical: s(2, 1),
+            fontSize: s(8, 6),
         },
         gdpr: {
-            fontSize: 7,
+            fontSize: s(7, 6),
             color: '#9CA3AF',
-            marginTop: c ? 8 : 12,
+            marginTop: s(12, 4),
             borderTopWidth: 0.5,
             borderTopColor: C.gray200,
-            paddingTop: 6,
-            paddingHorizontal: c ? 12 : 20,
-            paddingBottom: c ? 12 : 20,
+            paddingTop: s(6, 3),
+            paddingHorizontal: s(20, 10),
+            paddingBottom: s(20, 10),
         },
     });
 }
@@ -181,8 +179,8 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function VeterinaryPDF({ data, compact = false }: VeterinaryPDFProps) {
-    const styles = createStyles(compact);
+export function VeterinaryPDF({ data, compactScale = 0 }: VeterinaryPDFProps) {
+    const styles = createStyles(compactScale);
     const {
         personalInfo: p,
         experiences,
@@ -206,7 +204,6 @@ export function VeterinaryPDF({ data, compact = false }: VeterinaryPDFProps) {
             language='en'
         >
             <Page size='A4' style={styles.page}>
-                {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.headerName}>
                         {p.firstName} {p.lastName}
@@ -237,7 +234,6 @@ export function VeterinaryPDF({ data, compact = false }: VeterinaryPDFProps) {
                     </View>
                 </View>
 
-                {/* Body */}
                 <View style={styles.body}>
                     {experiences.length > 0 && (
                         <View style={styles.section}>

@@ -7,7 +7,7 @@ import { formatWebsiteDisplay, formatGithubDisplay, formatLinkedinDisplay } from
 
 interface DeveloperPDFProps {
     data: ResumeData;
-    compact?: boolean;
+    compactScale?: number; // 0 = normal, 1 = maximum compact
 }
 
 const C = {
@@ -21,64 +21,58 @@ const C = {
     cyan500: '#06B6D4',
 } as const;
 
-function createStyles(compact: boolean) {
-    const c = compact;
+// Interpolate between normal and max-compact values
+const lerp = (normal: number, min: number, t: number) =>
+    Math.round((normal + (min - normal) * t) * 10) / 10;
+
+function createStyles(t: number) {
+    const s = (n: number, m: number) => lerp(n, m, t);
     return StyleSheet.create({
         page: {
             fontFamily: 'Fira Code',
             backgroundColor: C.white,
             fontSize: 10,
             color: C.gray800,
-            paddingTop: c ? 10 : 20,
+            paddingTop: s(20, 8),
         },
         header: {
             backgroundColor: C.purple,
-            paddingTop: c ? 2 : 4,
-            paddingHorizontal: c ? 16 : 24,
-            paddingBottom: c ? 14 : 24,
+            paddingTop: s(4, 2),
+            paddingHorizontal: s(24, 14),
+            paddingBottom: s(24, 10),
             color: C.white,
         },
         headerName: {
-            fontSize: c ? 18 : 24,
+            fontSize: s(24, 16),
             fontFamily: 'Fira Code',
             fontWeight: 700,
-            marginBottom: c ? 2 : 4,
+            marginBottom: s(4, 1),
         },
-        headerTitle: { fontSize: c ? 11 : 13, marginBottom: c ? 6 : 10 },
-        headerRow: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: c ? 10 : 16,
-            marginTop: c ? 2 : 4,
-        },
-        headerLink: { color: C.white, fontSize: 9, textDecoration: 'none' },
-        body: { flexDirection: 'column', padding: c ? 12 : 20 },
-        section: { marginBottom: c ? 8 : 16 },
+        headerTitle: { fontSize: s(13, 10), marginBottom: s(10, 4) },
+        headerRow: { flexDirection: 'row', flexWrap: 'wrap', gap: s(16, 8), marginTop: s(4, 1) },
+        headerLink: { color: C.white, fontSize: s(9, 8), textDecoration: 'none' },
+        body: { flexDirection: 'column', padding: s(20, 10) },
+        section: { marginBottom: s(16, 6) },
         sectionHeader: {
-            fontSize: c ? 9 : 11,
+            fontSize: s(11, 8),
             fontFamily: 'Fira Code',
             fontWeight: 700,
             color: C.purple,
             borderBottomWidth: 1.5,
             borderBottomColor: C.purple,
-            paddingBottom: c ? 2 : 3,
-            marginBottom: c ? 5 : 8,
+            paddingBottom: s(3, 1),
+            marginBottom: s(8, 3),
         },
-        expBlock: { marginBottom: c ? 6 : 10 },
-        expTitle: { fontSize: c ? 9 : 11, fontFamily: 'Fira Code', fontWeight: 700 },
+        expBlock: { marginBottom: s(10, 4) },
+        expTitle: { fontSize: s(11, 8), fontFamily: 'Fira Code', fontWeight: 700 },
         expPurple: { color: C.purple },
-        expMeta: { fontSize: c ? 8 : 9, color: C.gray600, marginBottom: c ? 2 : 3 },
-        bulletRow: { flexDirection: 'row', marginBottom: c ? 1 : 2 },
-        bulletDot: { width: 10, fontSize: c ? 8 : 9, color: C.gray700 },
-        bulletText: { flex: 1, fontSize: c ? 8 : 9, color: C.gray700, lineHeight: c ? 1.3 : 1.4 },
-        eduBlock: { marginBottom: c ? 5 : 8 },
-        eduField: {
-            fontSize: c ? 9 : 10,
-            fontFamily: 'Fira Code',
-            fontWeight: 700,
-            color: C.purple,
-        },
-        eduMeta: { fontSize: c ? 8 : 9, color: C.gray700 },
+        expMeta: { fontSize: s(9, 7), color: C.gray600, marginBottom: s(3, 1) },
+        bulletRow: { flexDirection: 'row', marginBottom: s(2, 0.5) },
+        bulletDot: { width: 10, fontSize: s(9, 7), color: C.gray700 },
+        bulletText: { flex: 1, fontSize: s(9, 7), color: C.gray700, lineHeight: s(1.4, 1.2) },
+        eduBlock: { marginBottom: s(8, 3) },
+        eduField: { fontSize: s(10, 8), fontFamily: 'Fira Code', fontWeight: 700, color: C.purple },
+        eduMeta: { fontSize: s(9, 7), color: C.gray700 },
         skillsWrap: { flexDirection: 'row', flexWrap: 'wrap' },
         skillTag: {
             backgroundColor: C.gray900,
@@ -86,35 +80,35 @@ function createStyles(compact: boolean) {
             borderWidth: 1,
             borderColor: C.gray700,
             borderRadius: 3,
-            paddingHorizontal: c ? 4 : 6,
-            paddingVertical: c ? 1 : 2,
-            fontSize: c ? 7 : 8,
-            marginRight: 4,
-            marginBottom: c ? 3 : 4,
+            paddingHorizontal: s(6, 3),
+            paddingVertical: s(2, 1),
+            fontSize: s(8, 6),
+            marginRight: s(4, 2),
+            marginBottom: s(4, 2),
         },
-        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: c ? 2 : 4 },
-        langName: { fontFamily: 'Fira Code', fontWeight: 700, fontSize: c ? 8 : 9 },
-        langLevel: { color: C.purple, fontSize: c ? 8 : 9 },
+        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: s(4, 1) },
+        langName: { fontFamily: 'Fira Code', fontWeight: 700, fontSize: s(9, 7) },
+        langLevel: { color: C.purple, fontSize: s(9, 7) },
         interestsWrap: { flexDirection: 'row', flexWrap: 'wrap' },
         interestTag: {
             backgroundColor: C.cyan500,
             color: C.white,
             borderRadius: 10,
-            paddingHorizontal: c ? 6 : 8,
-            paddingVertical: c ? 2 : 3,
-            fontSize: c ? 7 : 8,
-            marginRight: 4,
-            marginBottom: c ? 3 : 4,
+            paddingHorizontal: s(8, 4),
+            paddingVertical: s(3, 1),
+            fontSize: s(8, 6),
+            marginRight: s(4, 2),
+            marginBottom: s(4, 2),
         },
         gdpr: {
-            fontSize: 7,
+            fontSize: s(7, 6),
             color: '#9CA3AF',
-            marginTop: c ? 8 : 12,
+            marginTop: s(12, 4),
             borderTopWidth: 0.5,
             borderTopColor: '#E5E7EB',
-            paddingTop: 6,
-            paddingHorizontal: c ? 12 : 20,
-            paddingBottom: c ? 12 : 20,
+            paddingTop: s(6, 3),
+            paddingHorizontal: s(20, 10),
+            paddingBottom: s(20, 10),
         },
     });
 }
@@ -139,8 +133,8 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function DeveloperPDF({ data, compact = false }: DeveloperPDFProps) {
-    const styles = createStyles(compact);
+export function DeveloperPDF({ data, compactScale = 0 }: DeveloperPDFProps) {
+    const styles = createStyles(compactScale);
     const {
         personalInfo: p,
         experiences,
@@ -164,7 +158,6 @@ export function DeveloperPDF({ data, compact = false }: DeveloperPDFProps) {
             language='en'
         >
             <Page size='A4' style={styles.page}>
-                {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.headerName}>
                         {p.firstName} {p.lastName}
@@ -202,7 +195,6 @@ export function DeveloperPDF({ data, compact = false }: DeveloperPDFProps) {
                     </View>
                 </View>
 
-                {/* Body */}
                 <View style={styles.body}>
                     {experiences.length > 0 && (
                         <View style={styles.section}>

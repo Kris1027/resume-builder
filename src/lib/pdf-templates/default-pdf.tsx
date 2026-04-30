@@ -7,7 +7,7 @@ import { formatLinkedinDisplay } from '@/lib/utils';
 
 interface DefaultPDFProps {
     data: ResumeData;
-    compact?: boolean;
+    compactScale?: number; // 0 = normal, 1 = maximum compact
 }
 
 const C = {
@@ -23,116 +23,119 @@ const C = {
     gray50: '#F9FAFB',
 } as const;
 
-function createStyles(compact: boolean) {
-    const c = compact;
+const lerp = (normal: number, min: number, t: number) =>
+    Math.round((normal + (min - normal) * t) * 10) / 10;
+
+function createStyles(t: number) {
+    const s = (n: number, m: number) => lerp(n, m, t);
     return StyleSheet.create({
         page: {
             fontFamily: 'Montserrat',
             backgroundColor: C.white,
             fontSize: 10,
             color: C.gray800,
-            paddingTop: c ? 10 : 20,
+            paddingTop: s(20, 8),
         },
         headerBlock: {
             backgroundColor: C.gray50,
-            paddingHorizontal: c ? 20 : 32,
-            paddingTop: c ? 2 : 4,
-            paddingBottom: c ? 8 : 16,
+            paddingHorizontal: s(32, 18),
+            paddingTop: s(4, 1),
+            paddingBottom: s(16, 6),
             borderBottomWidth: 1,
             borderBottomColor: C.gray200,
-            marginBottom: c ? 4 : 8,
+            marginBottom: s(8, 2),
         },
-        headerFirstName: { fontSize: c ? 18 : 22, letterSpacing: 2, color: C.gray800 },
+        headerFirstName: { fontSize: s(22, 15), letterSpacing: 2, color: C.gray800 },
         headerLastName: {
-            fontSize: c ? 18 : 22,
+            fontSize: s(22, 15),
             fontFamily: 'Montserrat',
             fontWeight: 700,
             letterSpacing: 2,
             color: C.gray800,
         },
-        headerNameRow: { flexDirection: 'row', justifyContent: 'center', marginBottom: c ? 2 : 4 },
+        headerNameRow: { flexDirection: 'row', justifyContent: 'center', marginBottom: s(4, 1) },
         headerTitle: {
             textAlign: 'center',
-            fontSize: c ? 9 : 11,
+            fontSize: s(11, 8),
             color: C.gray500,
-            marginBottom: c ? 4 : 8,
+            marginBottom: s(8, 2),
         },
         contactRow: {
             flexDirection: 'row',
             justifyContent: 'center',
             flexWrap: 'wrap',
-            gap: c ? 10 : 16,
+            gap: s(16, 8),
         },
-        contactLink: { fontSize: 9, color: C.gray500, textDecoration: 'none' },
-        body: { paddingHorizontal: c ? 20 : 32, paddingBottom: c ? 12 : 24 },
-        section: { marginBottom: c ? 8 : 14 },
+        contactLink: { fontSize: s(9, 7), color: C.gray500, textDecoration: 'none' },
+        body: { paddingHorizontal: s(32, 18), paddingBottom: s(24, 10) },
+        section: { marginBottom: s(14, 5) },
         sectionHeader: {
-            fontSize: 9,
+            fontSize: s(9, 7),
             fontFamily: 'Montserrat',
             fontWeight: 700,
             letterSpacing: 1.5,
             color: C.slateBlue,
             borderBottomWidth: 1.5,
             borderBottomColor: C.slateBlue,
-            paddingBottom: c ? 2 : 3,
-            marginBottom: c ? 5 : 8,
+            paddingBottom: s(3, 1),
+            marginBottom: s(8, 3),
         },
-        expBlock: { marginBottom: c ? 6 : 10 },
-        expTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
-        expPosition: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: c ? 9 : 10 },
-        expDate: { fontSize: c ? 8 : 9, color: C.gray500 },
+        expBlock: { marginBottom: s(10, 4) },
+        expTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: s(2, 1) },
+        expPosition: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: s(10, 8) },
+        expDate: { fontSize: s(9, 7), color: C.gray500 },
         expCompanyRow: {
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginBottom: c ? 2 : 3,
+            marginBottom: s(3, 1),
         },
         expCompany: {
             fontFamily: 'Montserrat',
             fontWeight: 700,
             color: C.gray700,
-            fontSize: c ? 8 : 9,
+            fontSize: s(9, 7),
         },
-        expLocation: { fontSize: 8, color: C.gray500 },
-        bulletRow: { flexDirection: 'row', marginBottom: c ? 1 : 1.5 },
-        bulletDot: { width: 10, fontSize: c ? 8 : 9 },
-        bulletText: { flex: 1, fontSize: c ? 8 : 9, color: C.gray700, lineHeight: c ? 1.3 : 1.4 },
-        eduBlock: { marginBottom: c ? 5 : 8 },
+        expLocation: { fontSize: s(8, 6), color: C.gray500 },
+        bulletRow: { flexDirection: 'row', marginBottom: s(1.5, 0.5) },
+        bulletDot: { width: 10, fontSize: s(9, 7) },
+        bulletText: { flex: 1, fontSize: s(9, 7), color: C.gray700, lineHeight: s(1.4, 1.2) },
+        eduBlock: { marginBottom: s(8, 3) },
         eduTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 1 },
-        eduDegree: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: c ? 9 : 10 },
-        eduYears: { fontSize: c ? 8 : 9, color: C.gray500 },
-        eduInstitution: { fontSize: c ? 8 : 9, color: C.gray700 },
-        skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: c ? 3 : 4 },
+        eduDegree: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: s(10, 8) },
+        eduYears: { fontSize: s(9, 7), color: C.gray500 },
+        eduInstitution: { fontSize: s(9, 7), color: C.gray700 },
+        skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: s(4, 2) },
         skillTag: {
             borderWidth: 1,
             borderColor: C.gray200,
             backgroundColor: C.gray100,
             borderRadius: 10,
-            paddingHorizontal: c ? 6 : 8,
-            paddingVertical: c ? 1 : 2,
-            fontSize: c ? 7 : 8,
+            paddingHorizontal: s(8, 4),
+            paddingVertical: s(2, 1),
+            fontSize: s(8, 6),
             color: C.gray700,
         },
-        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: c ? 2 : 3 },
-        langName: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: c ? 8 : 9 },
-        langLevel: { fontSize: c ? 8 : 9, color: C.gray500 },
-        interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: c ? 3 : 4 },
+        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: s(3, 1) },
+        langName: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: s(9, 7) },
+        langLevel: { fontSize: s(9, 7), color: C.gray500 },
+        interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: s(4, 2) },
         interestTag: {
             borderWidth: 1,
             borderColor: C.gray200,
             backgroundColor: C.gray100,
             borderRadius: 10,
-            paddingHorizontal: c ? 6 : 8,
-            paddingVertical: c ? 1 : 2,
-            fontSize: c ? 7 : 8,
+            paddingHorizontal: s(8, 4),
+            paddingVertical: s(2, 1),
+            fontSize: s(8, 6),
             color: C.gray700,
         },
         gdpr: {
-            fontSize: 7,
+            fontSize: s(7, 6),
             color: '#9CA3AF',
-            marginTop: c ? 8 : 12,
+            marginTop: s(12, 4),
             borderTopWidth: 0.5,
             borderTopColor: C.gray200,
-            paddingTop: 6,
+            paddingTop: s(6, 3),
         },
     });
 }
@@ -157,8 +160,8 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function DefaultPDF({ data, compact = false }: DefaultPDFProps) {
-    const styles = createStyles(compact);
+export function DefaultPDF({ data, compactScale = 0 }: DefaultPDFProps) {
+    const styles = createStyles(compactScale);
     const {
         personalInfo: p,
         experiences,
@@ -182,7 +185,6 @@ export function DefaultPDF({ data, compact = false }: DefaultPDFProps) {
             language='en'
         >
             <Page size='A4' style={styles.page}>
-                {/* Header */}
                 <View style={styles.headerBlock}>
                     <View style={styles.headerNameRow}>
                         <Text style={styles.headerFirstName}>{p.firstName} </Text>
@@ -215,7 +217,6 @@ export function DefaultPDF({ data, compact = false }: DefaultPDFProps) {
                     </View>
                 </View>
 
-                {/* Body */}
                 <View style={styles.body}>
                     {experiences.length > 0 && (
                         <View style={styles.section}>

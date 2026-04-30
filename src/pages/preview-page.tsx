@@ -23,10 +23,36 @@ import { DeveloperPDF } from '@/lib/pdf-templates/developer-pdf';
 import { DefaultPDF } from '@/lib/pdf-templates/default-pdf';
 import { VeterinaryPDF } from '@/lib/pdf-templates/veterinary-pdf';
 
-function getPdfDocument(resumeData: ResumeData, templateId: string, compact: boolean) {
-    if (templateId === 'developer') return <DeveloperPDF data={resumeData} compact={compact} />;
-    if (templateId === 'default') return <DefaultPDF data={resumeData} compact={compact} />;
-    return <VeterinaryPDF data={resumeData} compact={compact} />;
+function getPdfDocument(resumeData: ResumeData, templateId: string, compactScale: number) {
+    if (templateId === 'developer')
+        return <DeveloperPDF data={resumeData} compactScale={compactScale} />;
+    if (templateId === 'default')
+        return <DefaultPDF data={resumeData} compactScale={compactScale} />;
+    return <VeterinaryPDF data={resumeData} compactScale={compactScale} />;
+}
+
+// Binary search: find the minimum compactScale (0–1) that makes the PDF fit on one page.
+async function findMinCompactScale(
+    pdfFn: (scale: number) => Promise<Blob>,
+): Promise<number | null> {
+    // First check if max compaction (1.0) can fit at all
+    const maxBlob = await pdfFn(1);
+    if ((await countPdfPages(maxBlob)) > 1) return null; // Can't fit even at maximum compaction
+
+    let lo = 0;
+    let hi = 1;
+    // 6 iterations → precision of 1/64 ≈ 1.5%
+    for (let i = 0; i < 6; i++) {
+        const mid = (lo + hi) / 2;
+        const blob = await pdfFn(mid);
+        const pages = await countPdfPages(blob);
+        if (pages <= 1) {
+            hi = mid; // Can fit with less compaction — try smaller
+        } else {
+            lo = mid; // Still overflows — need more compaction
+        }
+    }
+    return hi;
 }
 
 export const PreviewPage = () => {
@@ -38,7 +64,8 @@ export const PreviewPage = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [exportError, setExportError] = useState<string | null>(null);
     const [isMultiPage, setIsMultiPage] = useState(false);
-    const [compact, setCompact] = useState(false);
+    const [optimalScale, setOptimalScale] = useState<number | null>(null); // null = searching
+    const [useCompact, setUseCompact] = useState(false);
 
     useEffect(() => {
         const storedData = safeStorage.getItem('resumeData');
@@ -63,21 +90,29 @@ export const PreviewPage = () => {
         }
     }, []);
 
-    // Detect page count after data loads
+    // Detect page count, then binary-search for optimal compact scale in background
     useEffect(() => {
         if (!resumeData) return;
         let cancelled = false;
 
-        async function checkPageCount() {
+        async function run() {
             const { pdf } = await import('@react-pdf/renderer');
-            const element = getPdfDocument(resumeData!, templateId, false);
-            const blob = await pdf(element).toBlob();
+
+            const normalBlob = await pdf(getPdfDocument(resumeData!, templateId, 0)).toBlob();
             if (cancelled) return;
-            const pages = await countPdfPages(blob);
-            if (!cancelled) setIsMultiPage(pages > 1);
+
+            const pages = await countPdfPages(normalBlob);
+            if (pages <= 1) return;
+
+            setIsMultiPage(true);
+
+            const scale = await findMinCompactScale((s) =>
+                pdf(getPdfDocument(resumeData!, templateId, s)).toBlob(),
+            );
+            if (!cancelled) setOptimalScale(scale ?? 1);
         }
 
-        checkPageCount().catch(() => {});
+        run().catch(() => {});
         return () => {
             cancelled = true;
         };
@@ -91,7 +126,8 @@ export const PreviewPage = () => {
                 resumeData.personalInfo?.firstName,
                 resumeData.personalInfo?.lastName,
             );
-            await exportToPDF(resumeData, templateId as TemplateId, { filename, compact });
+            const compactScale = useCompact ? (optimalScale ?? 1) : 0;
+            await exportToPDF(resumeData, templateId as TemplateId, { filename, compactScale });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
             setExportError(t('preview.exportError'));
@@ -133,7 +169,9 @@ export const PreviewPage = () => {
         );
     }
 
-    const pdfDocument = getPdfDocument(resumeData, templateId, compact);
+    const activeScale = useCompact ? (optimalScale ?? 1) : 0;
+    const pdfDocument = getPdfDocument(resumeData, templateId, activeScale);
+    const isSearching = isMultiPage && optimalScale === null;
 
     return (
         <div className='flex h-screen flex-col overflow-hidden'>
@@ -154,13 +192,13 @@ export const PreviewPage = () => {
                         </div>
 
                         <div className='flex items-center gap-3'>
-                            {/* Page layout toggle — shown only when content exceeds one page */}
+                            {/* Page layout toggle — visible only when content exceeds one page */}
                             {isMultiPage && (
                                 <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
                                     <button
-                                        onClick={() => setCompact(false)}
+                                        onClick={() => setUseCompact(false)}
                                         className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
-                                            !compact
+                                            !useCompact
                                                 ? 'bg-indigo-600 text-white'
                                                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
                                         }`}
@@ -169,14 +207,19 @@ export const PreviewPage = () => {
                                         {t('preview.multiPage')}
                                     </button>
                                     <button
-                                        onClick={() => setCompact(true)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
-                                            compact
+                                        onClick={() => setUseCompact(true)}
+                                        disabled={isSearching}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors disabled:opacity-50 ${
+                                            useCompact
                                                 ? 'bg-indigo-600 text-white'
                                                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
                                         }`}
                                     >
-                                        <FileText className='h-3.5 w-3.5' />
+                                        {isSearching ? (
+                                            <Loader2 className='h-3.5 w-3.5 animate-spin' />
+                                        ) : (
+                                            <FileText className='h-3.5 w-3.5' />
+                                        )}
                                         {t('preview.singlePage')}
                                     </button>
                                 </div>
