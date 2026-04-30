@@ -197,7 +197,7 @@ export const PreviewPage = () => {
                                 <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
                                     <button
                                         onClick={() => setUseCompact(false)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
+                                        className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
                                             !useCompact
                                                 ? 'bg-indigo-600 text-white'
                                                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
@@ -209,7 +209,7 @@ export const PreviewPage = () => {
                                     <button
                                         onClick={() => setUseCompact(true)}
                                         disabled={isSearching}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors disabled:opacity-50 ${
+                                        className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                                             useCompact
                                                 ? 'bg-indigo-600 text-white'
                                                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
