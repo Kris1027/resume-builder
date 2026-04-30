@@ -71,7 +71,7 @@ A modern, intuitive resume builder with multiple templates, dark mode, i18n, and
 
 - [react-i18next](https://react.i18next.com/) — Internationalization (PL + EN)
 - [pdfjs-dist](https://mozilla.github.io/pdf.js/) — PDF parsing for import
-- [html2canvas](https://html2canvas.hertzen.com/) + [jsPDF](https://rawgit.com/MrRio/jsPDF/master/docs/index.html) — PDF export
+- [@react-pdf/renderer](https://react-pdf.org/) — Text-based, ATS-readable PDF export with custom fonts
 - [Motion](https://motion.dev/) — Scroll-linked parallax and whileInView entrance animations
 - [date-fns](https://date-fns.org/) — Date utilities
 - [DOMPurify](https://github.com/cure53/DOMPurify) — HTML sanitization
@@ -128,7 +128,7 @@ Copy `.env.example` to `.env` and configure:
 
 | Template   | Font                | Color Scheme | Audience           |
 | ---------- | ------------------- | ------------ | ------------------ |
-| Developer  | JetBrains Mono      | Purple/blue  | Tech professionals |
+| Developer  | Fira Code           | Purple/green | Tech professionals |
 | Default    | Montserrat          | Gray         | All industries     |
 | Veterinary | Lato + Merriweather | Emerald/teal | Animal healthcare  |
 
