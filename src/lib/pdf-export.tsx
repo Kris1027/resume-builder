@@ -37,7 +37,7 @@ export async function exportToPDF(
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 100);
+    requestAnimationFrame(() => setTimeout(() => URL.revokeObjectURL(url), 1000));
 }
 
 export async function countPdfPages(blob: Blob): Promise<number> {

@@ -32,12 +32,12 @@ function getPdfDocument(resumeData: ResumeData, templateId: string, compactScale
 }
 
 // Binary search: find the minimum compactScale (0–1) that makes the PDF fit on one page.
+// Returns null when content can't fit even at maximum compaction.
 async function findMinCompactScale(
     pdfFn: (scale: number) => Promise<Blob>,
 ): Promise<number | null> {
-    // First check if max compaction (1.0) can fit at all
     const maxBlob = await pdfFn(1);
-    if ((await countPdfPages(maxBlob)) > 1) return null; // Can't fit even at maximum compaction
+    if ((await countPdfPages(maxBlob)) > 1) return null;
 
     let lo = 0;
     let hi = 1;
@@ -47,9 +47,9 @@ async function findMinCompactScale(
         const blob = await pdfFn(mid);
         const pages = await countPdfPages(blob);
         if (pages <= 1) {
-            hi = mid; // Can fit with less compaction — try smaller
+            hi = mid;
         } else {
-            lo = mid; // Still overflows — need more compaction
+            lo = mid;
         }
     }
     return hi;
@@ -64,7 +64,8 @@ export const PreviewPage = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [exportError, setExportError] = useState<string | null>(null);
     const [isMultiPage, setIsMultiPage] = useState(false);
-    const [optimalScale, setOptimalScale] = useState<number | null>(null); // null = searching
+    // null = searching, number = found scale, 'cannot-fit' = even max compaction overflows
+    const [optimalScale, setOptimalScale] = useState<number | 'cannot-fit' | null>(null);
     const [useCompact, setUseCompact] = useState(false);
 
     useEffect(() => {
@@ -93,6 +94,12 @@ export const PreviewPage = () => {
     // Detect page count, then binary-search for optimal compact scale in background
     useEffect(() => {
         if (!resumeData) return;
+
+        // Reset all compact-related state so stale values don't linger if templateId changes
+        setIsMultiPage(false);
+        setOptimalScale(null);
+        setUseCompact(false);
+
         let cancelled = false;
 
         async function run() {
@@ -109,10 +116,13 @@ export const PreviewPage = () => {
             const scale = await findMinCompactScale((s) =>
                 pdf(getPdfDocument(resumeData!, templateId, s)).toBlob(),
             );
-            if (!cancelled) setOptimalScale(scale ?? 1);
+            if (!cancelled) setOptimalScale(scale === null ? 'cannot-fit' : scale);
         }
 
-        run().catch(() => {});
+        run().catch((err) => {
+            if (import.meta.env.DEV) console.error('Failed to detect PDF page count:', err);
+        });
+
         return () => {
             cancelled = true;
         };
@@ -126,7 +136,7 @@ export const PreviewPage = () => {
                 resumeData.personalInfo?.firstName,
                 resumeData.personalInfo?.lastName,
             );
-            const compactScale = useCompact ? (optimalScale ?? 1) : 0;
+            const compactScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
             await exportToPDF(resumeData, templateId as TemplateId, { filename, compactScale });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
@@ -169,9 +179,11 @@ export const PreviewPage = () => {
         );
     }
 
-    const activeScale = useCompact ? (optimalScale ?? 1) : 0;
+    const activeScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
     const pdfDocument = getPdfDocument(resumeData, templateId, activeScale);
     const isSearching = isMultiPage && optimalScale === null;
+    // Hide toggle entirely when content can't fit even at max compaction
+    const showToggle = isMultiPage && optimalScale !== 'cannot-fit';
 
     return (
         <div className='flex h-screen flex-col overflow-hidden'>
@@ -192,10 +204,12 @@ export const PreviewPage = () => {
                         </div>
 
                         <div className='flex items-center gap-3'>
-                            {/* Page layout toggle — visible only when content exceeds one page */}
-                            {isMultiPage && (
+                            {/* Page layout toggle — visible only when content exceeds one page and can be compacted */}
+                            {showToggle && (
                                 <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
                                     <button
+                                        type='button'
+                                        aria-pressed={!useCompact}
                                         onClick={() => setUseCompact(false)}
                                         className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
                                             !useCompact
@@ -207,6 +221,8 @@ export const PreviewPage = () => {
                                         {t('preview.multiPage')}
                                     </button>
                                     <button
+                                        type='button'
+                                        aria-pressed={useCompact}
                                         onClick={() => setUseCompact(true)}
                                         disabled={isSearching}
                                         className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
