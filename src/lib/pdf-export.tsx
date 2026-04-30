@@ -1,6 +1,7 @@
 import type { ResumeData } from '@/types/form-types';
 import type { TemplateId } from '@/lib/template-ids';
 import { normalizePDFLang } from '@/lib/pdf-translations';
+import { getPdfjs } from '@/lib/pdfjs-singleton';
 
 export interface PDFExportOptions {
     filename?: string;
@@ -44,11 +45,17 @@ export async function exportToPDF(
 }
 
 export async function countPdfPages(blob: Blob): Promise<number> {
+    const { getDocument } = await getPdfjs();
     const buf = await blob.arrayBuffer();
-    const text = new TextDecoder('latin1').decode(new Uint8Array(buf));
-    const match = text.match(/\/Count\s+(\d+)/);
-    if (match) return parseInt(match[1], 10);
-    return 1;
+    const loadingTask = getDocument({ data: new Uint8Array(buf) });
+    try {
+        const pdfDoc = await loadingTask.promise;
+        const numPages = pdfDoc.numPages;
+        await pdfDoc.destroy();
+        return numPages;
+    } catch {
+        return 1;
+    }
 }
 
 export function generateResumeFilename(firstName?: string, lastName?: string): string {

@@ -1,18 +1,7 @@
 import type { ResumeFormValues, LanguageLevelProps } from '@/types/form-types';
 import type { TemplateId } from '@/lib/template-ids';
 import i18n from '@/i18n/config';
-
-let pdfjsPromise: Promise<typeof import('pdfjs-dist')> | null = null;
-
-function getPdfjs(): Promise<typeof import('pdfjs-dist')> {
-    if (!pdfjsPromise) {
-        pdfjsPromise = import('pdfjs-dist').then((mod) => {
-            mod.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-            return mod;
-        });
-    }
-    return pdfjsPromise;
-}
+import { getPdfjs } from '@/lib/pdfjs-singleton';
 
 /**
  * Extract text content from a PDF file

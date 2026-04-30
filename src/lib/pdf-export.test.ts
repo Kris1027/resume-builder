@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { generateResumeFilename } from './pdf-export';
+vi.mock('@/lib/pdfjs-singleton', () => ({
+    getPdfjs: vi.fn(),
+}));
+
+import { generateResumeFilename, countPdfPages } from './pdf-export';
+import { getPdfjs } from '@/lib/pdfjs-singleton';
 
 describe('generateResumeFilename', () => {
     it('builds filename from first and last name', () => {
@@ -21,5 +26,36 @@ describe('generateResumeFilename', () => {
 
     it('falls back to "my" when names are empty strings', () => {
         expect(generateResumeFilename('', '')).toBe('my-Resume.pdf');
+    });
+});
+
+describe('countPdfPages', () => {
+    function makeGetDocument(numPages: number) {
+        return vi.fn().mockReturnValue({
+            promise: Promise.resolve({
+                numPages,
+                destroy: vi.fn().mockResolvedValue(undefined),
+            }),
+        });
+    }
+
+    it('returns the numPages from pdfjs', async () => {
+        vi.mocked(getPdfjs).mockResolvedValue({
+            getDocument: makeGetDocument(3),
+        } as never);
+
+        const blob = new Blob(['fake pdf'], { type: 'application/pdf' });
+        expect(await countPdfPages(blob)).toBe(3);
+    });
+
+    it('returns 1 when pdfjs throws', async () => {
+        vi.mocked(getPdfjs).mockResolvedValue({
+            getDocument: vi.fn().mockReturnValue({
+                promise: Promise.reject(new Error('parse error')),
+            }),
+        } as never);
+
+        const blob = new Blob(['not a pdf'], { type: 'application/pdf' });
+        expect(await countPdfPages(blob)).toBe(1);
     });
 });
