@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import type { ResumeData } from '@/types/form-types';
-import { ArrowLeft, Download, Edit, Loader2, FileWarning } from 'lucide-react';
+import { ArrowLeft, Download, Edit, Loader2, FileWarning, FileText, Files } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import { exportToPDF, generateResumeFilename } from '@/lib/pdf-export';
+import { exportToPDF, countPdfPages, generateResumeFilename } from '@/lib/pdf-export';
 import type { TemplateId } from '@/lib/template-ids';
 import { useTranslation } from 'react-i18next';
 import {
@@ -23,6 +23,12 @@ import { DeveloperPDF } from '@/lib/pdf-templates/developer-pdf';
 import { DefaultPDF } from '@/lib/pdf-templates/default-pdf';
 import { VeterinaryPDF } from '@/lib/pdf-templates/veterinary-pdf';
 
+function getPdfDocument(resumeData: ResumeData, templateId: string, compact: boolean) {
+    if (templateId === 'developer') return <DeveloperPDF data={resumeData} compact={compact} />;
+    if (templateId === 'default') return <DefaultPDF data={resumeData} compact={compact} />;
+    return <VeterinaryPDF data={resumeData} compact={compact} />;
+}
+
 export const PreviewPage = () => {
     const { t } = useTranslation();
     const search = useSearch({ from: '/preview' }) as { templateId?: string };
@@ -31,6 +37,8 @@ export const PreviewPage = () => {
     const [resumeData, setResumeData] = useState<ResumeData | null>(null);
     const [isExporting, setIsExporting] = useState(false);
     const [exportError, setExportError] = useState<string | null>(null);
+    const [isMultiPage, setIsMultiPage] = useState(false);
+    const [compact, setCompact] = useState(false);
 
     useEffect(() => {
         const storedData = safeStorage.getItem('resumeData');
@@ -55,6 +63,26 @@ export const PreviewPage = () => {
         }
     }, []);
 
+    // Detect page count after data loads
+    useEffect(() => {
+        if (!resumeData) return;
+        let cancelled = false;
+
+        async function checkPageCount() {
+            const { pdf } = await import('@react-pdf/renderer');
+            const element = getPdfDocument(resumeData!, templateId, false);
+            const blob = await pdf(element).toBlob();
+            if (cancelled) return;
+            const pages = await countPdfPages(blob);
+            if (!cancelled) setIsMultiPage(pages > 1);
+        }
+
+        checkPageCount().catch(() => {});
+        return () => {
+            cancelled = true;
+        };
+    }, [resumeData, templateId]);
+
     const handleDownloadPDF = async () => {
         if (!resumeData) return;
         setIsExporting(true);
@@ -63,7 +91,7 @@ export const PreviewPage = () => {
                 resumeData.personalInfo?.firstName,
                 resumeData.personalInfo?.lastName,
             );
-            await exportToPDF(resumeData, templateId as TemplateId, { filename });
+            await exportToPDF(resumeData, templateId as TemplateId, { filename, compact });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
             setExportError(t('preview.exportError'));
@@ -105,14 +133,7 @@ export const PreviewPage = () => {
         );
     }
 
-    const pdfDocument =
-        templateId === 'developer' ? (
-            <DeveloperPDF data={resumeData} />
-        ) : templateId === 'default' ? (
-            <DefaultPDF data={resumeData} />
-        ) : (
-            <VeterinaryPDF data={resumeData} />
-        );
+    const pdfDocument = getPdfDocument(resumeData, templateId, compact);
 
     return (
         <div className='flex h-screen flex-col overflow-hidden'>
@@ -133,6 +154,34 @@ export const PreviewPage = () => {
                         </div>
 
                         <div className='flex items-center gap-3'>
+                            {/* Page layout toggle — shown only when content exceeds one page */}
+                            {isMultiPage && (
+                                <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
+                                    <button
+                                        onClick={() => setCompact(false)}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
+                                            !compact
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+                                        }`}
+                                    >
+                                        <Files className='h-3.5 w-3.5' />
+                                        {t('preview.multiPage')}
+                                    </button>
+                                    <button
+                                        onClick={() => setCompact(true)}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
+                                            compact
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+                                        }`}
+                                    >
+                                        <FileText className='h-3.5 w-3.5' />
+                                        {t('preview.singlePage')}
+                                    </button>
+                                </div>
+                            )}
+
                             <Button
                                 variant='outline'
                                 size='sm'

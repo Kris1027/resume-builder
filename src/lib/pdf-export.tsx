@@ -3,7 +3,7 @@ import type { TemplateId } from '@/lib/template-ids';
 
 export interface PDFExportOptions {
     filename?: string;
-    singlePage?: boolean;
+    compact?: boolean;
 }
 
 export async function exportToPDF(
@@ -11,7 +11,7 @@ export async function exportToPDF(
     templateId: TemplateId,
     options: PDFExportOptions = {},
 ): Promise<void> {
-    const { filename = 'resume.pdf' } = options;
+    const { filename = 'resume.pdf', compact = false } = options;
 
     const [{ pdf }, { DeveloperPDF }, { DefaultPDF }, { VeterinaryPDF }] = await Promise.all([
         import('@react-pdf/renderer'),
@@ -22,11 +22,11 @@ export async function exportToPDF(
 
     const element =
         templateId === 'developer' ? (
-            <DeveloperPDF data={resumeData} />
+            <DeveloperPDF data={resumeData} compact={compact} />
         ) : templateId === 'default' ? (
-            <DefaultPDF data={resumeData} />
+            <DefaultPDF data={resumeData} compact={compact} />
         ) : (
-            <VeterinaryPDF data={resumeData} />
+            <VeterinaryPDF data={resumeData} compact={compact} />
         );
 
     const blob = await pdf(element).toBlob();
@@ -38,6 +38,15 @@ export async function exportToPDF(
     link.click();
     document.body.removeChild(link);
     setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+export async function countPdfPages(blob: Blob): Promise<number> {
+    const buf = await blob.arrayBuffer();
+    const text = new TextDecoder('latin1').decode(new Uint8Array(buf));
+    // The PDF page tree root has /Count N — the authoritative total page count
+    const match = text.match(/\/Count\s+(\d+)/);
+    if (match) return parseInt(match[1], 10);
+    return 1;
 }
 
 export function generateResumeFilename(firstName?: string, lastName?: string): string {

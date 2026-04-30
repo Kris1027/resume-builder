@@ -7,6 +7,7 @@ import { formatLinkedinDisplay } from '@/lib/utils';
 
 interface DefaultPDFProps {
     data: ResumeData;
+    compact?: boolean;
 }
 
 const C = {
@@ -22,97 +23,119 @@ const C = {
     gray50: '#F9FAFB',
 } as const;
 
-const styles = StyleSheet.create({
-    page: {
-        fontFamily: 'Montserrat',
-        backgroundColor: C.white,
-        fontSize: 10,
-        color: C.gray800,
-        paddingTop: 20,
-    },
-    headerBlock: {
-        backgroundColor: C.gray50,
-        paddingHorizontal: 32,
-        paddingTop: 4,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: C.gray200,
-        marginBottom: 8,
-    },
-    headerFirstName: { fontSize: 22, letterSpacing: 2, color: C.gray800 },
-    headerLastName: {
-        fontSize: 22,
-        fontFamily: 'Montserrat',
-        fontWeight: 700,
-        letterSpacing: 2,
-        color: C.gray800,
-    },
-    headerNameRow: { flexDirection: 'row', justifyContent: 'center', marginBottom: 4 },
-    headerTitle: { textAlign: 'center', fontSize: 11, color: C.gray500, marginBottom: 8 },
-    contactRow: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 16 },
-    contactLink: { fontSize: 9, color: C.gray500, textDecoration: 'none' },
-    body: { paddingHorizontal: 32, paddingBottom: 24 },
-    section: { marginBottom: 14 },
-    sectionHeader: {
-        fontSize: 9,
-        fontFamily: 'Montserrat',
-        fontWeight: 700,
-        letterSpacing: 1.5,
-        color: C.slateBlue,
-        borderBottomWidth: 1.5,
-        borderBottomColor: C.slateBlue,
-        paddingBottom: 3,
-        marginBottom: 8,
-    },
-    expBlock: { marginBottom: 10 },
-    expTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
-    expPosition: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 10 },
-    expDate: { fontSize: 9, color: C.gray500 },
-    expCompanyRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 },
-    expCompany: { fontFamily: 'Montserrat', fontWeight: 700, color: C.gray700, fontSize: 9 },
-    expLocation: { fontSize: 8, color: C.gray500 },
-    bulletRow: { flexDirection: 'row', marginBottom: 1.5 },
-    bulletDot: { width: 10, fontSize: 9 },
-    bulletText: { flex: 1, fontSize: 9, color: C.gray700, lineHeight: 1.4 },
-    eduBlock: { marginBottom: 8 },
-    eduTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 1 },
-    eduDegree: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 10 },
-    eduYears: { fontSize: 9, color: C.gray500 },
-    eduInstitution: { fontSize: 9, color: C.gray700 },
-    skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-    skillTag: {
-        borderWidth: 1,
-        borderColor: C.gray200,
-        backgroundColor: C.gray100,
-        borderRadius: 10,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        fontSize: 8,
-        color: C.gray700,
-    },
-    langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 },
-    langName: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: 9 },
-    langLevel: { fontSize: 9, color: C.gray500 },
-    interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-    interestTag: {
-        borderWidth: 1,
-        borderColor: C.gray200,
-        backgroundColor: C.gray100,
-        borderRadius: 10,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        fontSize: 8,
-        color: C.gray700,
-    },
-    gdpr: {
-        fontSize: 7,
-        color: '#9CA3AF',
-        marginTop: 12,
-        borderTopWidth: 0.5,
-        borderTopColor: C.gray200,
-        paddingTop: 6,
-    },
-});
+function createStyles(compact: boolean) {
+    const c = compact;
+    return StyleSheet.create({
+        page: {
+            fontFamily: 'Montserrat',
+            backgroundColor: C.white,
+            fontSize: 10,
+            color: C.gray800,
+            paddingTop: c ? 10 : 20,
+        },
+        headerBlock: {
+            backgroundColor: C.gray50,
+            paddingHorizontal: c ? 20 : 32,
+            paddingTop: c ? 2 : 4,
+            paddingBottom: c ? 8 : 16,
+            borderBottomWidth: 1,
+            borderBottomColor: C.gray200,
+            marginBottom: c ? 4 : 8,
+        },
+        headerFirstName: { fontSize: c ? 18 : 22, letterSpacing: 2, color: C.gray800 },
+        headerLastName: {
+            fontSize: c ? 18 : 22,
+            fontFamily: 'Montserrat',
+            fontWeight: 700,
+            letterSpacing: 2,
+            color: C.gray800,
+        },
+        headerNameRow: { flexDirection: 'row', justifyContent: 'center', marginBottom: c ? 2 : 4 },
+        headerTitle: {
+            textAlign: 'center',
+            fontSize: c ? 9 : 11,
+            color: C.gray500,
+            marginBottom: c ? 4 : 8,
+        },
+        contactRow: {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: c ? 10 : 16,
+        },
+        contactLink: { fontSize: 9, color: C.gray500, textDecoration: 'none' },
+        body: { paddingHorizontal: c ? 20 : 32, paddingBottom: c ? 12 : 24 },
+        section: { marginBottom: c ? 8 : 14 },
+        sectionHeader: {
+            fontSize: 9,
+            fontFamily: 'Montserrat',
+            fontWeight: 700,
+            letterSpacing: 1.5,
+            color: C.slateBlue,
+            borderBottomWidth: 1.5,
+            borderBottomColor: C.slateBlue,
+            paddingBottom: c ? 2 : 3,
+            marginBottom: c ? 5 : 8,
+        },
+        expBlock: { marginBottom: c ? 6 : 10 },
+        expTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
+        expPosition: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: c ? 9 : 10 },
+        expDate: { fontSize: c ? 8 : 9, color: C.gray500 },
+        expCompanyRow: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: c ? 2 : 3,
+        },
+        expCompany: {
+            fontFamily: 'Montserrat',
+            fontWeight: 700,
+            color: C.gray700,
+            fontSize: c ? 8 : 9,
+        },
+        expLocation: { fontSize: 8, color: C.gray500 },
+        bulletRow: { flexDirection: 'row', marginBottom: c ? 1 : 1.5 },
+        bulletDot: { width: 10, fontSize: c ? 8 : 9 },
+        bulletText: { flex: 1, fontSize: c ? 8 : 9, color: C.gray700, lineHeight: c ? 1.3 : 1.4 },
+        eduBlock: { marginBottom: c ? 5 : 8 },
+        eduTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 1 },
+        eduDegree: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: c ? 9 : 10 },
+        eduYears: { fontSize: c ? 8 : 9, color: C.gray500 },
+        eduInstitution: { fontSize: c ? 8 : 9, color: C.gray700 },
+        skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: c ? 3 : 4 },
+        skillTag: {
+            borderWidth: 1,
+            borderColor: C.gray200,
+            backgroundColor: C.gray100,
+            borderRadius: 10,
+            paddingHorizontal: c ? 6 : 8,
+            paddingVertical: c ? 1 : 2,
+            fontSize: c ? 7 : 8,
+            color: C.gray700,
+        },
+        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: c ? 2 : 3 },
+        langName: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: c ? 8 : 9 },
+        langLevel: { fontSize: c ? 8 : 9, color: C.gray500 },
+        interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: c ? 3 : 4 },
+        interestTag: {
+            borderWidth: 1,
+            borderColor: C.gray200,
+            backgroundColor: C.gray100,
+            borderRadius: 10,
+            paddingHorizontal: c ? 6 : 8,
+            paddingVertical: c ? 1 : 2,
+            fontSize: c ? 7 : 8,
+            color: C.gray700,
+        },
+        gdpr: {
+            fontSize: 7,
+            color: '#9CA3AF',
+            marginTop: c ? 8 : 12,
+            borderTopWidth: 0.5,
+            borderTopColor: C.gray200,
+            paddingTop: 6,
+        },
+    });
+}
 
 function formatPDFDateShort(dateString: string): string {
     if (!dateString) return '';
@@ -134,7 +157,8 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function DefaultPDF({ data }: DefaultPDFProps) {
+export function DefaultPDF({ data, compact = false }: DefaultPDFProps) {
+    const styles = createStyles(compact);
     const {
         personalInfo: p,
         experiences,

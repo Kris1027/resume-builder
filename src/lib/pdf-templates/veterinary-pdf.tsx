@@ -7,6 +7,7 @@ import { formatLinkedinDisplay } from '@/lib/utils';
 
 interface VeterinaryPDFProps {
     data: ResumeData;
+    compact?: boolean;
 }
 
 const C = {
@@ -26,126 +27,139 @@ const C = {
     gray200: '#E5E7EB',
 } as const;
 
-const styles = StyleSheet.create({
-    page: {
-        fontFamily: 'Lato',
-        backgroundColor: C.white,
-        fontSize: 10,
-        color: C.gray800,
-        paddingTop: 20,
-    },
-    header: {
-        backgroundColor: C.emerald50,
-        borderBottomWidth: 2,
-        borderBottomColor: C.emerald600,
-        paddingHorizontal: 24,
-        paddingTop: 0,
-        paddingBottom: 16,
-    },
-    headerName: {
-        fontFamily: 'Merriweather',
-        fontWeight: 700,
-        fontSize: 22,
-        color: C.gray800,
-        textAlign: 'center',
-        marginBottom: 4,
-    },
-    headerTitle: { textAlign: 'center', fontSize: 12, color: C.emerald700, marginBottom: 10 },
-    contactRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-        gap: 8,
-    },
-    contactLink: {
-        fontSize: 9,
-        color: C.gray600,
-        textDecoration: 'none',
-        backgroundColor: C.white,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 10,
-    },
-    body: { flexDirection: 'column', padding: 20 },
-    section: { marginBottom: 14 },
-    sectionHeader: {
-        fontSize: 10,
-        fontFamily: 'Merriweather',
-        fontWeight: 700,
-        color: C.emerald700,
-        borderBottomWidth: 1.5,
-        borderBottomColor: C.emerald200,
-        paddingBottom: 3,
-        marginBottom: 8,
-    },
-    expBlock: {
-        marginBottom: 10,
-        borderLeftWidth: 2,
-        borderLeftColor: C.emerald200,
-        paddingLeft: 10,
-    },
-    expPosition: { fontFamily: 'Lato', fontWeight: 700, fontSize: 10, color: C.gray800 },
-    expMeta: { fontSize: 9, color: C.gray600, marginBottom: 3 },
-    expCompany: { fontSize: 9, color: C.emerald700 },
-    bulletRow: { flexDirection: 'row', marginBottom: 2 },
-    bulletDot: { width: 10, fontSize: 9, color: C.emerald600 },
-    bulletText: { flex: 1, fontSize: 9, color: C.gray700, lineHeight: 1.4 },
-    eduBlock: { marginBottom: 8 },
-    eduDegree: { fontFamily: 'Lato', fontWeight: 700, fontSize: 10, color: C.gray800 },
-    eduInstitution: { fontSize: 9, color: C.emerald700 },
-    eduYears: { fontSize: 9, color: C.gray500 },
-    card: {
-        borderRadius: 6,
-        padding: 10,
-        marginBottom: 12,
-    },
-    cardEmerald: { backgroundColor: C.emerald50 },
-    cardTeal: { backgroundColor: C.teal50 },
-    cardDeep: { backgroundColor: C.emerald100 },
-    cardHeader: {
-        fontSize: 9,
-        fontFamily: 'Merriweather',
-        fontWeight: 700,
-        color: C.emerald700,
-        borderBottomWidth: 1,
-        borderBottomColor: C.emerald200,
-        paddingBottom: 3,
-        marginBottom: 6,
-    },
-    cardHeaderTeal: { color: C.teal600, borderBottomColor: C.emerald200 },
-    cardHeaderDeep: { color: C.emerald800, borderBottomColor: C.emerald200 },
-    skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
-    skillTag: {
-        backgroundColor: C.emerald100,
-        color: C.emerald700,
-        borderRadius: 3,
-        paddingHorizontal: 5,
-        paddingVertical: 2,
-        fontSize: 8,
-    },
-    langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 },
-    langName: { fontFamily: 'Lato', fontWeight: 700, fontSize: 9 },
-    langLevel: { fontSize: 9, color: C.teal600 },
-    interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
-    interestTag: {
-        backgroundColor: C.emerald200,
-        color: C.emerald800,
-        borderRadius: 3,
-        paddingHorizontal: 5,
-        paddingVertical: 2,
-        fontSize: 8,
-    },
-    gdpr: {
-        fontSize: 7,
-        color: '#9CA3AF',
-        marginTop: 12,
-        borderTopWidth: 0.5,
-        borderTopColor: C.gray200,
-        paddingTop: 6,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-    },
-});
+function createStyles(compact: boolean) {
+    const c = compact;
+    return StyleSheet.create({
+        page: {
+            fontFamily: 'Lato',
+            backgroundColor: C.white,
+            fontSize: 10,
+            color: C.gray800,
+            paddingTop: c ? 10 : 20,
+        },
+        header: {
+            backgroundColor: C.emerald50,
+            borderBottomWidth: 2,
+            borderBottomColor: C.emerald600,
+            paddingHorizontal: c ? 16 : 24,
+            paddingTop: 0,
+            paddingBottom: c ? 8 : 16,
+        },
+        headerName: {
+            fontFamily: 'Merriweather',
+            fontWeight: 700,
+            fontSize: c ? 18 : 22,
+            color: C.gray800,
+            textAlign: 'center',
+            marginBottom: c ? 2 : 4,
+        },
+        headerTitle: {
+            textAlign: 'center',
+            fontSize: c ? 10 : 12,
+            color: C.emerald700,
+            marginBottom: c ? 6 : 10,
+        },
+        contactRow: {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: c ? 5 : 8,
+        },
+        contactLink: {
+            fontSize: 9,
+            color: C.gray600,
+            textDecoration: 'none',
+            backgroundColor: C.white,
+            paddingHorizontal: c ? 6 : 8,
+            paddingVertical: c ? 2 : 3,
+            borderRadius: 10,
+        },
+        body: { flexDirection: 'column', padding: c ? 12 : 20 },
+        section: { marginBottom: c ? 8 : 14 },
+        sectionHeader: {
+            fontSize: c ? 9 : 10,
+            fontFamily: 'Merriweather',
+            fontWeight: 700,
+            color: C.emerald700,
+            borderBottomWidth: 1.5,
+            borderBottomColor: C.emerald200,
+            paddingBottom: c ? 2 : 3,
+            marginBottom: c ? 5 : 8,
+        },
+        expBlock: {
+            marginBottom: c ? 6 : 10,
+            borderLeftWidth: 2,
+            borderLeftColor: C.emerald200,
+            paddingLeft: c ? 7 : 10,
+        },
+        expPosition: {
+            fontFamily: 'Lato',
+            fontWeight: 700,
+            fontSize: c ? 9 : 10,
+            color: C.gray800,
+        },
+        expMeta: { fontSize: c ? 8 : 9, color: C.gray600, marginBottom: c ? 2 : 3 },
+        expCompany: { fontSize: c ? 8 : 9, color: C.emerald700 },
+        bulletRow: { flexDirection: 'row', marginBottom: c ? 1 : 2 },
+        bulletDot: { width: 10, fontSize: c ? 8 : 9, color: C.emerald600 },
+        bulletText: { flex: 1, fontSize: c ? 8 : 9, color: C.gray700, lineHeight: c ? 1.3 : 1.4 },
+        eduBlock: { marginBottom: c ? 5 : 8 },
+        eduDegree: { fontFamily: 'Lato', fontWeight: 700, fontSize: c ? 9 : 10, color: C.gray800 },
+        eduInstitution: { fontSize: c ? 8 : 9, color: C.emerald700 },
+        eduYears: { fontSize: c ? 8 : 9, color: C.gray500 },
+        card: {
+            borderRadius: 6,
+            padding: c ? 7 : 10,
+            marginBottom: c ? 7 : 12,
+        },
+        cardEmerald: { backgroundColor: C.emerald50 },
+        cardTeal: { backgroundColor: C.teal50 },
+        cardDeep: { backgroundColor: C.emerald100 },
+        cardHeader: {
+            fontSize: c ? 8 : 9,
+            fontFamily: 'Merriweather',
+            fontWeight: 700,
+            color: C.emerald700,
+            borderBottomWidth: 1,
+            borderBottomColor: C.emerald200,
+            paddingBottom: c ? 2 : 3,
+            marginBottom: c ? 4 : 6,
+        },
+        cardHeaderTeal: { color: C.teal600, borderBottomColor: C.emerald200 },
+        cardHeaderDeep: { color: C.emerald800, borderBottomColor: C.emerald200 },
+        skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
+        skillTag: {
+            backgroundColor: C.emerald100,
+            color: C.emerald700,
+            borderRadius: 3,
+            paddingHorizontal: c ? 4 : 5,
+            paddingVertical: c ? 1 : 2,
+            fontSize: c ? 7 : 8,
+        },
+        langRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: c ? 2 : 3 },
+        langName: { fontFamily: 'Lato', fontWeight: 700, fontSize: c ? 8 : 9 },
+        langLevel: { fontSize: c ? 8 : 9, color: C.teal600 },
+        interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 3 },
+        interestTag: {
+            backgroundColor: C.emerald200,
+            color: C.emerald800,
+            borderRadius: 3,
+            paddingHorizontal: c ? 4 : 5,
+            paddingVertical: c ? 1 : 2,
+            fontSize: c ? 7 : 8,
+        },
+        gdpr: {
+            fontSize: 7,
+            color: '#9CA3AF',
+            marginTop: c ? 8 : 12,
+            borderTopWidth: 0.5,
+            borderTopColor: C.gray200,
+            paddingTop: 6,
+            paddingHorizontal: c ? 12 : 20,
+            paddingBottom: c ? 12 : 20,
+        },
+    });
+}
 
 function formatPDFDateShort(dateString: string): string {
     if (!dateString) return '';
@@ -167,7 +181,8 @@ function parseDescriptionLines(description: string): string[] {
         .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
 }
 
-export function VeterinaryPDF({ data }: VeterinaryPDFProps) {
+export function VeterinaryPDF({ data, compact = false }: VeterinaryPDFProps) {
+    const styles = createStyles(compact);
     const {
         personalInfo: p,
         experiences,
